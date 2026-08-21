@@ -1,0 +1,28 @@
+{
+  "id": "acc_TSVZXCgLfmnxW8",
+  "type": "route",
+  "status": "created",
+  "email": "vendor1@test.com",
+  "profile": {
+    "category": "healthcare",
+    "subcategory": "clinic",
+    "addresses": {
+      "registered": {
+        "street1": "123 Test Street",
+        "street2": "Near City Center",
+        "city": "Bengaluru",
+        "state": "KARNATAKA",
+        "postal_code": "560001",
+        "country": "IN"
+      }
+    },
+    "description": "Healthcare marketplace vendor"
+  },
+  "notes": [],
+  "created_at": 1787334621,
+  "phone": "+919000000000",
+  "contact_name": "Vendor One",
+  "business_type": "not_yet_registered",
+  "legal_business_name": "Test Vendor 1",
+  "customer_facing_business_name": "Test Vendor 1"
+}
