@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+ url      = env("DATABASE_URL")
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  orderId     String   @unique @map("order_id")
+  amount      Int
+  currency    String   @default("INR")
+  customerId  String   @map("customer_id")
+  platformFee Int      @default(0) @map("platform_fee")
+  tds         Int      @default(0)
+  refund      Int      @default(0)
+  status      String   @default("paid")
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  transfers   RouteTransfer[]
+  reconciliations Reconciliation[]
+  
+  @@map("orders")
+}
+
+model RouteTransfer {
+  id                    String   @id @default(cuid())
+  transferId            String   @unique @map("transfer_id")
+  entity                String   @default("transfer")
+  source                String
+  order                 Order    @relation(fields: [source], references: [orderId])
+  recipient             String
+  amount                Int
+  currency              String   @default("INR")
+  amountReversed        Int      @default(0) @map("amount_reversed")
+  onHold                Boolean  @default(false) @map("on_hold")
+  onHoldUntil           Int?     @map("on_hold_until")
+  recipientSettlementId String?  @map("recipient_settlement_id")
+  settlementStatus      String   @default("pending") @map("settlement_status")
+  fee                   Int      @default(0)
+  tax                   Int      @default(0)
+  notes                 Json     @default("{}")
+  errorDescription      String?  @map("error_description")
+  createdAt             Int      @map("created_at")
+  
+  reconciliations Reconciliation[]
+  
+  @@map("route_transfers")
+}
+
+model Reconciliation {
+  id                  String   @id @default(cuid())
+  batchId             String   @map("batch_id")
+  orderId             String   @map("order_id")
+  order               Order    @relation(fields: [orderId], references: [orderId])
+  transferId          String?  @map("transfer_id")
+  transfer            RouteTransfer? @relation(fields: [transferId], references: [transferId])
+  
+  customerPaid        Int      @map("customer_paid")
+  routeSplit          Int      @map("route_split")
+  platformFee         Int      @default(0) @map("platform_fee")
+  tdsDeducted         Int      @default(0) @map("tds_deducted")
+  chargebackHold      Int      @default(0) @map("chargeback_hold")
+  refundAmount        Int      @default(0) @map("refund_amount")
+  finalSettled        Int      @default(0) @map("final_settled")
+  fee                 Int      @default(0)
+  tax                 Int      @default(0)
+  
+  status              String   @default("pending")
+  matchConfidence     Float    @default(0) @map("match_confidence")
+  
+  aiExplanation       String?  @map("ai_explanation")
+  discrepancyCategory String?  @map("discrepancy_category")
+  confidenceScore     Float?   @map("confidence_score")
+  
+  resolvedBy          String?  @map("resolved_by")
+  resolutionAction    String?  @map("resolution_action")
+  createdAt           DateTime @default(now()) @map("created_at")
+  resolvedAt          DateTime? @map("resolved_at")
+  
+  exceptions  Exception[]
+  auditLogs   AuditLog[]
+  
+  @@map("reconciliations")
+}
+
+model Exception {
+  id                String   @id @default(cuid())
+  reconciliationId  String   @map("reconciliation_id")
+  reconciliation    Reconciliation @relation(fields: [reconciliationId], references: [id])
+  
+  category          String
+  description       String
+  aiExplanation     String   @map("ai_explanation")
+  confidenceScore   Float    @map("confidence_score")
+  amountDiscrepancy Int      @map("amount_discrepancy")
+  
+  status            String   @default("open")
+  createdAt         DateTime @default(now()) @map("created_at")
+  resolvedAt        DateTime? @map("resolved_at")
+  
+  @@map("exceptions")
+}
+
+model AuditLog {
+  id                String   @id @default(cuid())
+  reconciliationId  String   @map("reconciliation_id")
+  reconciliation    Reconciliation @relation(fields: [reconciliationId], references: [id])
+  
+  action            String
+  actor             String   @default("system")
+  details           Json
+  createdAt         DateTime @default(now()) @map("created_at")
+  
+  @@map("audit_logs")
+}
