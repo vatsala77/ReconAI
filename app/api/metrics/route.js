@@ -1,18 +1,26 @@
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const total = await prisma.reconciliation.count();
-    const matched = await prisma.reconciliation.count({ where: { status: 'matched' } });
-    const exceptionsCount = await prisma.reconciliation.count({ where: { status: 'exception' } });
-    const openExceptions = await prisma.exception.count({ where: { status: 'open' } });
+    const { searchParams } = new URL(request.url);
+    const uploadBatchId = searchParams.get('uploadBatchId');
+    const where = uploadBatchId ? { uploadBatchId } : {};
 
+    const total = await prisma.reconciliation.count({ where });
+    const matched = await prisma.reconciliation.count({ where: { ...where, status: 'matched' } });
+    const exceptionsCount = await prisma.reconciliation.count({ where: { ...where, status: 'exception' } });
+
+    const reconIds = (await prisma.reconciliation.findMany({ where, select: { id: true } })).map((r) => r.id);
+    const openExceptions = await prisma.exception.count({
+      where: { status: 'open', reconciliationId: { in: reconIds } },
+    });
     const amountAtRisk = await prisma.exception.aggregate({
-      where: { status: 'open' },
+      where: { status: 'open', reconciliationId: { in: reconIds } },
       _sum: { amountDiscrepancy: true },
     });
 
     const latestBatch = await prisma.reconciliation.findFirst({
+      where,
       orderBy: { createdAt: 'desc' },
       select: { batchId: true, createdAt: true },
     });
@@ -31,9 +39,6 @@ export async function GET() {
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }

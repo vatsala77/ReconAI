@@ -1,9 +1,17 @@
 import './globals.css';
+import { SessionProvider } from 'next-auth/react';
+import { auth } from '@/lib/auth';
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const session = await auth();
+
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SessionProvider session={session}>
+          {children}
+        </SessionProvider>
+      </body>
     </html>
   );
 }

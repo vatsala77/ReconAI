@@ -3,16 +3,18 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const uploadBatchId = searchParams.get('uploadBatchId');
+    const companyId = searchParams.get('companyId');
 
-    const logs = await prisma.auditLog.findMany({
-      where: uploadBatchId ? { reconciliation: { uploadBatchId } } : {},
-      include: { reconciliation: { select: { orderId: true, status: true } } },
+    if (!companyId) {
+      return new Response(JSON.stringify({ error: 'companyId required' }), { status: 400 });
+    }
+
+    const uploads = await prisma.uploadBatch.findMany({
+      where: { companyId },
       orderBy: { createdAt: 'desc' },
-      take: 50,
     });
 
-    return new Response(JSON.stringify(logs), {
+    return new Response(JSON.stringify(uploads), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

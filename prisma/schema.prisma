@@ -18,13 +18,41 @@ model Order {
   refund      Int      @default(0)
   status      String   @default("paid")
   createdAt   DateTime @default(now()) @map("created_at")
-  
+   uploadBatchId String?      @map("upload_batch_id")   // ← ADD THIS
+  uploadBatch   UploadBatch? @relation(fields: [uploadBatchId], references: [id])  // ← ADD THIS
+
   transfers   RouteTransfer[]
   reconciliations Reconciliation[]
   
   @@map("orders")
 }
 
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+   user         User?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  uploadBatches UploadBatch[]
+
+  @@map("companies")
+}
+
+model UploadBatch {
+  id          String   @id @default(cuid())
+  companyId   String   @map("company_id")
+  company     Company  @relation(fields: [companyId], references: [id])
+  fileName    String   @map("file_name")
+  orderCount  Int      @default(0) @map("order_count")
+  status      String   @default("uploaded") // uploaded, reconciled
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  orders          Order[]
+  reconciliations Reconciliation[]
+
+  @@map("upload_batches")
+}
 model RouteTransfer {
   id                    String   @id @default(cuid())
   transferId            String   @unique @map("transfer_id")
@@ -57,7 +85,9 @@ model Reconciliation {
   order               Order    @relation(fields: [orderId], references: [orderId])
   transferId          String?  @map("transfer_id")
   transfer            RouteTransfer? @relation(fields: [transferId], references: [transferId])
-  
+   uploadBatchId String?      @map("upload_batch_id")   // ← ADD THIS
+  uploadBatch   UploadBatch? @relation(fields: [uploadBatchId], references: [id])  // ← ADD THIS
+
   customerPaid        Int      @map("customer_paid")
   routeSplit          Int      @map("route_split")
   platformFee         Int      @default(0) @map("platform_fee")
@@ -115,4 +145,52 @@ model AuditLog {
   createdAt         DateTime @default(now()) @map("created_at")
   
   @@map("audit_logs")
+}
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  passwordHash  String
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  company       Company?  @relation(fields: [companyId], references: [id])
+  companyId     String?   @unique
+  createdAt     DateTime  @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

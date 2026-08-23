@@ -1,9 +1,13 @@
 import { runReconciliation } from '@/lib/reconcile';
 
-export async function POST() {
+export async function POST(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const uploadBatchId = searchParams.get('uploadBatchId') || null;
+
     const batchId = `batch_${Date.now()}`;
-    const result = await runReconciliation(batchId);
+    const result = await runReconciliation(batchId, uploadBatchId);
+
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -18,12 +22,7 @@ export async function POST() {
 
 export async function GET() {
   return new Response(
-    JSON.stringify({
-      message: 'ReconAI Reconcile API',
-      usage: 'Send POST request to run reconciliation',
-      method: 'POST',
-      body: '{}',
-    }),
+    JSON.stringify({ message: 'ReconAI Reconcile API', usage: 'POST with ?uploadBatchId=X' }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
   );
 }
