@@ -1,8 +1,28 @@
 'use client';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function UploadsList({ uploads }) {
   const router = useRouter();
+  const [syncing, setSyncing] = useState(false);
+
+  async function handleRazorpaySync() {
+    setSyncing(true);
+    try {
+      const res = await fetch('/api/sync-razorpay', { method: 'POST' });
+      const data = await res.json();
+
+      if (data.success) {
+        router.push(`/dashboard/${data.batchId}`);
+      } else {
+        alert(data.error || 'Sync failed');
+      }
+    } catch (err) {
+      alert('Something went wrong syncing with Razorpay');
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   return (
     <main className="page">
@@ -12,7 +32,12 @@ export default function UploadsList({ uploads }) {
             <p className="title">Your Uploads</p>
             <p className="subtitle">Select an upload to view its reconciliation analysis</p>
           </div>
-          <button className="btn-primary" onClick={() => router.push('/upload')}>+ New Upload</button>
+          <div className="header-actions">
+            <button className="btn-secondary" onClick={handleRazorpaySync} disabled={syncing}>
+              {syncing ? 'Syncing…' : '🔄 Sync from Razorpay'}
+            </button>
+            <button className="btn-primary" onClick={() => router.push('/upload')}>+ New Upload</button>
+          </div>
         </div>
 
         {uploads.length === 0 ? (
@@ -42,6 +67,7 @@ export default function UploadsList({ uploads }) {
       </div>
 
       <style jsx>{`
+        .header-actions { display: flex; align-items: center; gap: 12px; }
         .uploads-list { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
         .upload-item {
           display: flex;
@@ -77,6 +103,18 @@ export default function UploadsList({ uploads }) {
           border: none;
           cursor: pointer;
         }
+        .btn-secondary {
+          padding: 10px 20px;
+          border-radius: 8px;
+          background: #1f2942;
+          border: 1px solid #2a344e;
+          color: #ffffff;
+          font-weight: 500;
+          font-size: 14px;
+          cursor: pointer;
+        }
+        .btn-secondary:hover { background: #2a344e; }
+        .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .empty-state-card {
           margin-top: 40px;

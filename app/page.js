@@ -124,6 +124,40 @@ export default function Home() {
           </div>
         </section>
 
+        {/* CAROUSEL */}
+        <section id="pain-section" className="pain-section reveal-on-scroll">
+          <div className="section-header">
+            <h2>Real Problem, Real Pain</h2>
+            <p>Multi-vendor reconciliation is where efficiency goes to die. Here&apos;s what the industry is saying.</p>
+          </div>
+
+          <div className="carousel-wrap">
+            <div className="fade-edge left" />
+            <div className="fade-edge right" />
+            <div className="carousel-track">
+              {[...painPoints, ...painPoints].map((p, i) => (
+                <a
+                  key={i}
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pain-card"
+                >
+                  <div className="pain-card-head">
+                    <div className="pain-icon">{p.icon}</div>
+                    <div>
+                      <p className="pain-source">{p.source}</p>
+                      <p className="pain-domain">{p.domain}</p>
+                    </div>
+                  </div>
+                  <p className="pain-quote">&ldquo;{p.quote}&rdquo;</p>
+                  <p className="pain-link">Read source →</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* FINAL CTA */}
         <section className="final-cta reveal-on-scroll">
           <div className="final-cta-panel">
@@ -220,8 +254,8 @@ export default function Home() {
         .btn-primary {
           background: #0070f3;
           box-shadow: 0 4px 14px rgba(0,112,243,0.2);
-          color: white;
-          text-decoration: none;
+          color: white !important;
+          text-decoration: none !important;
           padding: 10px 20px;
           border-radius: 10px;
           font-weight: 500;
@@ -233,7 +267,12 @@ export default function Home() {
           border: none;
           cursor: pointer;
         }
-        .btn-primary:hover { box-shadow: 0 6px 20px rgba(0,112,243,0.35); transform: translateY(-2px); background: #0059c5; }
+        .btn-primary:hover {
+          text-decoration: none !important;
+          box-shadow: 0 6px 20px rgba(0,112,243,0.35);
+          transform: translateY(-2px);
+          background: #0059c5;
+        }
         .btn-primary.lg { padding: 14px 32px; border-radius: 12px; font-size: 15px; }
 
         .btn-ghost {
@@ -344,7 +383,7 @@ export default function Home() {
           box-shadow: 0 0 10px rgba(0,112,243,0.3);
         }
 
-        .section-header { text-align: center; margin-bottom: 48px; padding: 0 24px; }
+        .section-header { text-align: center; margin-bottom: 64px; padding: 0 24px; }
         .section-header h2 {
           font-size: 32px;
           font-weight: 700;
@@ -371,6 +410,60 @@ export default function Home() {
         }
         .how-card h3 { font-size: 20px; font-weight: 700; margin: 0 0 12px 0; }
         .how-card p { color: #c1c6d7; font-size: 15px; line-height: 1.6; margin: 0; }
+
+        .pain-section { margin-bottom: 96px; }
+
+        .carousel-wrap { position: relative; overflow: hidden; padding: 32px 0; }
+        .fade-edge {
+          position: absolute;
+          top: 0; bottom: 0;
+          width: 128px;
+          z-index: 10;
+          pointer-events: none;
+        }
+        .fade-edge.left { left: 0; background: linear-gradient(to right, #07122a, transparent); }
+        .fade-edge.right { right: 0; background: linear-gradient(to left, #07122a, transparent); }
+
+        .carousel-track {
+          display: flex;
+          width: max-content;
+          gap: 24px;
+          padding: 0 24px;
+          animation: scroll 45s linear infinite;
+        }
+        .carousel-track:hover { animation-play-state: paused; }
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        .pain-card {
+          width: 340px;
+          flex-shrink: 0;
+          background: #101b33;
+          border: 1px solid #1f2942;
+          border-radius: 16px;
+          padding: 28px;
+          text-decoration: none;
+          color: inherit;
+          display: block;
+          transition: border-color 0.2s;
+        }
+        .pain-card:hover { border-color: rgba(0,112,243,0.3); }
+        .pain-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .pain-icon {
+          width: 40px; height: 40px;
+          border-radius: 50%;
+          background: #1f2942;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+        }
+        .pain-source { font-weight: 600; margin: 0; font-size: 15px; }
+        .pain-domain { color: #c1c6d7; font-size: 13px; margin: 2px 0 0 0; }
+        .pain-quote { color: #c1c6d7; font-style: italic; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0; }
+        .pain-link { color: #aec6ff; font-size: 13px; margin: 0; }
 
         .final-cta { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
         .final-cta-panel {
@@ -412,3 +505,48 @@ export default function Home() {
     </>
   );
 }
+
+const painPoints = [
+  {
+    source: 'Ultra Commerce',
+    domain: 'Marketplace Ops',
+    icon: '🏢',
+    quote: 'Multi-vendor cart complexity — where one customer order spans multiple vendors requiring simultaneous splits — is a documented reconciliation failure point.',
+    url: 'https://ultracommerce.co/blog/how-to-optimise-your-marketplace-settlement-workflow',
+  },
+  {
+    source: 'Unicommerce',
+    domain: 'E-commerce Research',
+    icon: '📉',
+    quote: 'Small discrepancies that seem trivial at low scale multiply into lakhs of unrecovered revenue as marketplaces grow.',
+    url: 'https://unicommerce.com/blog/marketplace-payment-reconciliation-the-invisible-margin-leak-killing-your-profitability/',
+  },
+  {
+    source: 'PKC India',
+    domain: 'Audit & Compliance',
+    icon: '⚠️',
+    quote: 'Delayed settlements, hidden deductions, multiple gateways, and GST mismatches make manual reconciliation time-consuming and error-prone.',
+    url: 'https://www.pkcindia.com/blogs/ecommerce-payment-reconciliation/',
+  },
+  {
+    source: 'OneFinOps',
+    domain: 'Financial Operations',
+    icon: '🏦',
+    quote: 'TDS discrepancies point to missed deductions — short-deduction attracts monthly interest penalties under Section 201(1A).',
+    url: 'https://onefinops.com/blog/vendor-payment-reconciliation-guide',
+  },
+  {
+    source: 'Appscrip',
+    domain: 'Marketplace Tech',
+    icon: '👥',
+    quote: 'Vendor payout delays from manual reconciliation frustrate sellers and drive them to competing platforms.',
+    url: 'https://appscrip.com/blog/payment-processing-in-multivendor-marketplace/',
+  },
+  {
+    source: 'ReconPe',
+    domain: 'Industry Analysis',
+    icon: '🤖',
+    quote: 'AI-powered reconciliation engines are already replacing manual spreadsheet-based processes at scale across Indian e-commerce.',
+    url: 'https://reconpe.com/blog/best-reconciliation-software-indian-ecommerce-sellers-2026/',
+  },
+];

@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { ragStore } from '@/lib/rag';
+import { classifyQuestion } from '@/lib/chatRouter';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(request) {
   try {
@@ -12,55 +13,91 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: 'Question is required' }), { status: 400 });
     }
 
-    // Pull this batch's exceptions + summary stats as context
     const where = uploadBatchId ? { uploadBatchId } : {};
-    const reconciliations = await prisma.reconciliation.findMany({
-      where,
-      include: { exceptions: true },
+    const classification = classifyQuestion(question);
+
+    let contextBlock = '';
+
+    if (classification.type === 'specific_order') {
+      const recon = await prisma.reconciliation.findFirst({
+        where: { ...where, orderId: { contains: classification.orderId } },
+        include: { exceptions: true },
+      });
+
+      if (!recon) {
+        contextBlock = `No order matching "${classification.orderId}" was found in this batch.`;
+      } else {
+        contextBlock = `ORDER DETAIL:\n${JSON.stringify({
+          orderId: recon.orderId,
+          status: recon.status,
+          category: recon.discrepancyCategory,
+          customerPaid: recon.customerPaid,
+          finalSettled: recon.finalSettled,
+          explanation: recon.exceptions[0]?.aiExplanation || 'No exception — this order matched cleanly.',
+          amountDiscrepancy: recon.exceptions[0]?.amountDiscrepancy || 0,
+          taxLineBreakdown: recon.exceptions[0]?.taxLineBreakdown || null,
+        })}`;
+      }
+    } else if (classification.type === 'category_breakdown') {
+      const grouped = await prisma.reconciliation.groupBy({
+        by: ['discrepancyCategory'],
+        where: { ...where, status: 'exception' },
+        _count: true,
+      });
+      contextBlock = `EXCEPTION CATEGORY BREAKDOWN:\n${JSON.stringify(grouped)}`;
+    } else if (classification.type === 'top_risk') {
+      const topExceptions = await prisma.exception.findMany({
+        where: { reconciliation: where },
+        orderBy: { amountDiscrepancy: 'desc' },
+        take: 5,
+        include: { reconciliation: { select: { orderId: true } } },
+      });
+      contextBlock = `TOP 5 HIGHEST-RISK EXCEPTIONS:\n${JSON.stringify(
+        topExceptions.map((e) => ({
+          orderId: e.reconciliation.orderId,
+          category: e.category,
+          amountDiscrepancy: e.amountDiscrepancy,
+          explanation: e.aiExplanation,
+        }))
+      )}`;
+    } else {
+      const reconciliations = await prisma.reconciliation.findMany({ where, include: { exceptions: true } });
+      const total = reconciliations.length;
+      const matched = reconciliations.filter((r) => r.status === 'matched').length;
+      const exceptions = reconciliations.filter((r) => r.status === 'exception');
+      const exceptionSummary = exceptions.map((r) => ({
+        orderId: r.orderId,
+        category: r.discrepancyCategory,
+        amountDiscrepancy: r.exceptions[0]?.amountDiscrepancy || 0,
+      }));
+      contextBlock = `BATCH SUMMARY: Total ${total}, Matched ${matched}, Exceptions ${exceptions.length}\n\nEXCEPTIONS:\n${JSON.stringify(exceptionSummary)}`;
+    }
+
+    const needsRAG = /tds|gst|tax|section|regulation|rule|chargeback|compliance|utr|bank/i.test(question);
+    const relevantRules = needsRAG
+      ? (await ragStore.query(question, 1)).map((d) => d.text).join('\n\n')
+      : '';
+
+    const prompt = `You are ReconAI's assistant. Answer using ONLY the data below. Be concise (2-3 sentences max), specific, cite order IDs/amounts where relevant.
+
+${contextBlock}
+
+${relevantRules ? `RELEVANT REGULATION: ${relevantRules}` : ''}
+
+HISTORY: ${history.slice(-4).map((h) => `${h.role}: ${h.content}`).join('\n')}
+
+QUESTION: ${question}`;
+
+    const completion = await groq.chat.completions.create({
+      model: 'openai/gpt-oss-120b',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3,
+      max_tokens: 250,
     });
 
-    const total = reconciliations.length;
-    const matched = reconciliations.filter((r) => r.status === 'matched').length;
-    const exceptions = reconciliations.filter((r) => r.status === 'exception');
+    const answer = completion.choices[0].message.content;
 
-    const exceptionSummary = exceptions.map((r) => ({
-      orderId: r.orderId,
-      category: r.discrepancyCategory,
-      customerPaid: r.customerPaid,
-      finalSettled: r.finalSettled,
-      explanation: r.exceptions[0]?.aiExplanation || 'No explanation generated yet',
-      amountDiscrepancy: r.exceptions[0]?.amountDiscrepancy || 0,
-    }));
-
-    // Pull relevant regulation context via RAG based on the question
-    const relevantDocs = await ragStore.query(question, 2);
-    const relevantRules = relevantDocs.map((d) => d.text).join('\n\n');
-
-    const prompt = `You are ReconAI's assistant, embedded in a reconciliation dashboard. Answer the user's question using ONLY the data below. Be concise, specific, cite exact amounts and order IDs where relevant. If the question can't be answered from this data, say so honestly.
-
-BATCH SUMMARY:
-- Total orders: ${total}
-- Matched: ${matched}
-- Exceptions: ${exceptions.length}
-
-EXCEPTIONS DATA (JSON):
-${JSON.stringify(exceptionSummary, null, 2)}
-
-RELEVANT REGULATIONS (if applicable to the question):
-${relevantRules}
-
-CONVERSATION HISTORY:
-${history.map((h) => `${h.role}: ${h.content}`).join('\n')}
-
-USER QUESTION: ${question}
-
-Answer in 2-4 sentences, plain language, no markdown headers.`;
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash', generationConfig: { temperature: 0.3 } });
-    const result = await model.generateContent(prompt);
-    const answer = result.response.text();
-
-    return new Response(JSON.stringify({ answer }), {
+    return new Response(JSON.stringify({ answer, routedAs: classification.type }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

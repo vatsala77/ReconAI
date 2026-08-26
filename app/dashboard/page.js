@@ -14,6 +14,8 @@ export default async function DashboardPage() {
     where: { companyId: session.user.companyId },
     orderBy: { createdAt: 'desc' },
   });
+  
+
 
   return <DashboardUI session={session} uploads={uploads} />;
 }

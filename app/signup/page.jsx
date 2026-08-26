@@ -43,8 +43,8 @@ export default function SignupPage() {
 
   return (
     <>
-      <div className="ambient-glow top" />
-      <div className="ambient-glow bottom" />
+      <div className="ambient-glow top left" />
+      <div className="ambient-glow bottom right" />
 
       <nav className="navbar">
         <div className="navbar-inner">
@@ -95,7 +95,7 @@ export default function SignupPage() {
 
             {error && <p className="error-text">{error}</p>}
 
-            <button type="submit" disabled={loading}>
+            <button type="submit" disabled={loading} className="btn-primary lg">
               {loading ? 'Creating account…' : 'Sign up →'}
             </button>
           </form>
@@ -107,8 +107,19 @@ export default function SignupPage() {
       </main>
 
       <style jsx>{`
+        :global(body) {
+          background-color: #07122a;
+          color: #ffffff;
+          overflow-x: hidden;
+          background-image:
+            linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+          background-size: 50px 50px;
+          font-family: 'Segoe UI', -apple-system, sans-serif;
+        }
+
         .ambient-glow {
-          position: fixed;
+          position: absolute;
           width: 800px;
           height: 800px;
           background: radial-gradient(circle, rgba(0,112,243,0.08) 0%, rgba(7,18,42,0) 60%);
@@ -117,7 +128,7 @@ export default function SignupPage() {
           pointer-events: none;
         }
         .ambient-glow.top { top: -20%; left: -10%; }
-        .ambient-glow.bottom { bottom: -20%; right: -10%; }
+        .ambient-glow.bottom { bottom: 10%; right: -10%; }
 
         .navbar {
           position: fixed;
@@ -131,7 +142,7 @@ export default function SignupPage() {
         .navbar-inner { display: flex; align-items: center; padding: 16px 24px; max-width: 1280px; margin: 0 auto; }
         .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
         .brand-icon { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, #0070f3, #0059c5); }
-        .brand-name { font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+        .brand-name { font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
 
         .auth-page {
           min-height: 100vh;
@@ -167,8 +178,8 @@ export default function SignupPage() {
           box-shadow: 0 0 8px rgba(0,112,243,0.8);
         }
 
-        h1 { color: #ffffff; font-size: 28px; margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.02em; }
-        .subtitle { color: #c1c6d7; font-size: 15px; line-height: 1.6; margin: 0 0 28px 0; }
+        h1 { color: #ffffff; font-size: 32px; margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.01em; }
+        .subtitle { color: #c1c6d7; font-size: 16px; line-height: 1.6; margin: 0 0 28px 0; }
 
         form { display: flex; flex-direction: column; }
         label { display: block; color: #ffffff; font-size: 14px; font-weight: 500; margin-bottom: 8px; margin-top: 20px; }
@@ -192,42 +203,44 @@ export default function SignupPage() {
         input::placeholder { color: #6b7690; }
 
         .error-text {
-          color: #ff8080;
+          color: #f87171;
           font-size: 13px;
           margin: 16px 0 0 0;
           padding: 10px 14px;
-          background: rgba(255,107,107,0.08);
-          border: 1px solid rgba(255,107,107,0.2);
+          background: rgba(248,113,113,0.08);
+          border: 1px solid rgba(248,113,113,0.2);
           border-radius: 8px;
         }
 
-        button {
-          padding: 13px;
+        .btn-primary {
           background: #0070f3;
           box-shadow: 0 4px 14px rgba(0,112,243,0.2);
           color: white;
-          border: none;
+          text-decoration: none;
+          padding: 12px 20px;
           border-radius: 12px;
           font-weight: 600;
           font-size: 15px;
-          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
           transition: all 0.3s ease;
+          border: none;
+          cursor: pointer;
           margin-top: 28px;
+          width: 100%;
         }
-        button:hover:not(:disabled) {
-          box-shadow: 0 6px 20px rgba(0,112,243,0.35);
-          transform: translateY(-1px);
-          background: #0059c5;
-        }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(0,112,243,0.35); transform: translateY(-2px); background: #0059c5; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .switch-link {
           margin-top: 24px;
-          font-size: 13px;
-          color: #7c8493;
+          font-size: 14px;
+          color: #c1c6d7;
           text-align: center;
         }
-        .switch-link a { color: #aec6ff; text-decoration: none; }
+        .switch-link a { color: #aec6ff; text-decoration: none; font-weight: 500; }
         .switch-link a:hover { text-decoration: underline; }
       `}</style>
     </>

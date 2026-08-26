@@ -8,6 +8,14 @@ const SUGGESTED_QUESTIONS = [
   "Which category needs urgent review?",
 ];
 
+const ROUTE_LABELS = {
+  specific_order: 'Order Lookup',
+  category_breakdown: 'Category Analysis',
+  top_risk: 'Risk Ranking',
+  summary: 'Batch Summary',
+  general: 'General Query',
+};
+
 export default function ChatPanel({ uploadBatchId }) {
   const [messages, setMessages] = useState([
     { role: 'assistant', content: "Ask me anything about this reconciliation batch — or tap a suggestion below to get started." },
@@ -43,7 +51,10 @@ export default function ChatPanel({ uploadBatchId }) {
         }),
       });
       const data = await res.json();
-      setMessages([...newMessages, { role: 'assistant', content: data.answer || 'Sorry, I couldn\'t process that.' }]);
+      setMessages([
+        ...newMessages,
+        { role: 'assistant', content: data.answer || "Sorry, I couldn't process that.", routedAs: data.routedAs },
+      ]);
     } catch (err) {
       setMessages([...newMessages, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
     } finally {
@@ -72,7 +83,12 @@ export default function ChatPanel({ uploadBatchId }) {
         {messages.map((m, i) => (
           <div key={i} className={`chat-bubble ${m.role}`}>
             {m.role === 'assistant' && <div className="bubble-avatar">✦</div>}
-            <div className="bubble-content">{m.content}</div>
+            <div className="bubble-wrap">
+              {m.role === 'assistant' && m.routedAs && (
+                <span className="route-badge">🔍 Routed as: {ROUTE_LABELS[m.routedAs] || m.routedAs}</span>
+              )}
+              <div className="bubble-content">{m.content}</div>
+            </div>
           </div>
         ))}
 
@@ -152,6 +168,18 @@ export default function ChatPanel({ uploadBatchId }) {
           background: linear-gradient(135deg, #0070f3, #0059c5);
           display: flex; align-items: center; justify-content: center;
           font-size: 11px; color: white; flex-shrink: 0; margin-top: 2px;
+        }
+        .bubble-wrap { display: flex; flex-direction: column; gap: 4px; }
+        .route-badge {
+          font-size: 10.5px;
+          color: #aec6ff;
+          background: rgba(0,112,243,0.1);
+          border: 1px solid rgba(0,112,243,0.25);
+          padding: 3px 8px;
+          border-radius: 6px;
+          width: fit-content;
+          font-family: 'Courier New', monospace;
+          letter-spacing: 0.02em;
         }
         .bubble-content {
           font-size: 13.5px;

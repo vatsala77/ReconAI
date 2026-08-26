@@ -17,16 +17,47 @@ model Order {
   tds         Int      @default(0)
   refund      Int      @default(0)
   status      String   @default("paid")
+   sellerId     String  @default("unknown") @map("seller_id")
+  sellerType   String  @default("unknown") @map("seller_type")
   createdAt   DateTime @default(now()) @map("created_at")
+    panAvailable Boolean @default(true) @map("pan_available")
    uploadBatchId String?      @map("upload_batch_id")   // ← ADD THIS
   uploadBatch   UploadBatch? @relation(fields: [uploadBatchId], references: [id])  // ← ADD THIS
-
+  gstFilings GSTFiling[]
   transfers   RouteTransfer[]
   reconciliations Reconciliation[]
   
   @@map("orders")
 }
+model BankSettlement {
+  id             String    @id @default(cuid())
+  utr            String    @unique
+  transferId     String    @map("transfer_id")
+  transfer       RouteTransfer @relation(fields: [transferId], references: [transferId])
+  amountCredited Int       @map("amount_credited")
+  creditedAt     DateTime? @map("credited_at")
+  status         String    @default("pending")
+  uploadBatchId  String?   @map("upload_batch_id")
+  uploadBatch    UploadBatch? @relation(fields: [uploadBatchId], references: [id])
+  createdAt      DateTime  @default(now()) @map("created_at")
 
+  @@map("bank_settlements")
+}
+
+model GSTFiling {
+  id            String   @id @default(cuid())
+  vendorGSTIN   String   @map("vendor_gstin")
+  orderId       String   @map("order_id")
+  order         Order    @relation(fields: [orderId], references: [orderId])
+  tcsReported   Int      @map("tcs_reported")
+  filingPeriod  String   @map("filing_period")
+  filedAt       DateTime? @map("filed_at")
+  status        String   @default("pending")
+  uploadBatchId String?  @map("upload_batch_id")
+  uploadBatch   UploadBatch? @relation(fields: [uploadBatchId], references: [id])
+
+  @@map("gst_filings")
+}
 model Company {
   id          String   @id @default(cuid())
   name        String
@@ -47,7 +78,8 @@ model UploadBatch {
   orderCount  Int      @default(0) @map("order_count")
   status      String   @default("uploaded") // uploaded, reconciled
   createdAt   DateTime @default(now()) @map("created_at")
-
+bankSettlements BankSettlement[]
+  gstFilings      GSTFiling[]
   orders          Order[]
   reconciliations Reconciliation[]
 
@@ -72,7 +104,7 @@ model RouteTransfer {
   notes                 Json     @default("{}")
   errorDescription      String?  @map("error_description")
   createdAt             Int      @map("created_at")
-  
+ bankSettlements       BankSettlement[]
   reconciliations Reconciliation[]
   
   @@map("route_transfers")
@@ -126,7 +158,9 @@ model Exception {
   aiExplanation     String   @map("ai_explanation")
   confidenceScore   Float    @map("confidence_score")
   amountDiscrepancy Int      @map("amount_discrepancy")
-  
+
+  taxLineBreakdown Json? @map("tax_line_breakdown")
+
   status            String   @default("open")
   createdAt         DateTime @default(now()) @map("created_at")
   resolvedAt        DateTime? @map("resolved_at")

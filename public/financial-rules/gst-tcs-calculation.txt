@@ -1,0 +1,24 @@
+# Context: CGST Section 52 - E-commerce TCS & GSTR-8 Compliance
+
+## Legal Framework & Core Mandate
+- **Statutory Provision:** Section 52 of the CGST Act.
+- **Applicability:** Electronic Commerce Operators (ECOs) / E-commerce platforms.
+- **TCS Rate:** 1% of the net value of taxable supplies.
+- **Filing Frequency:** Monthly.
+- **Reporting Return:** GSTR-8 filing.
+- **Mandatory Action:** Collect TCS, report via GSTR-8, and deposit funds with the government.
+
+## Financial Formula
+- **Base Metric:** Net Value of Taxable Supplies.
+- **Formula Components:** Gross Transaction Value MINUS Sales Returns MINUS Discounts.
+- **Expected TCS Calculation:** 1% × Net Value of Taxable Supplies.
+
+## Root Causes of TCS Reconciliation Mismatches
+A mismatch between expected TCS (1% of gross transaction value) and actually reported TCS occurs due to:
+1. **Taxability Classification Errors:** Incorrectly classifying a taxable supply as exempt or non-taxable.
+2. **Net Value Calculation Errors:** Failing to accurately deduct sales returns or applicable discounts from the gross value.
+3. **Filing Timeline Gaps:** Delayed or incomplete transactional data entry for the given monthly tax period.
+
+## Legal and Financial Risks
+- **Under-Reporting Impact:** Creates an immediate compliance and financial liability for the e-commerce platform.
+- **Statutory Penalties:** Attracts interest charges and financial penalties under GST law if discrepancies are not corrected before the official filing deadline.

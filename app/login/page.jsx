@@ -82,7 +82,7 @@ export default function LoginPage() {
           </form>
 
           <p className="switch-link">
-            Don't have an account? <Link href="/signup">Sign up</Link>
+            Don&apos;t have an account? <Link href="/signup">Sign up</Link>
           </p>
         </div>
       </main>

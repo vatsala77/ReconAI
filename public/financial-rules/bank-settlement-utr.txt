@@ -1,0 +1,26 @@
+# Context: Razorpay Route Transfer & UTR Bank Settlement
+
+## Summary
+Route transfers show as "settled" or "processed" once Razorpay initiates them. However, actual vendor bank credit requires 1-2 business days via IMPS, NEFT, or RTGS. Tracking and confirmation rely entirely on the Unique Transaction Reference (UTR) number issued by the receiving bank.
+
+## Key Metadata
+- **System Owner:** Razorpay (Route feature)
+- **Primary Tracking Identifier:** UTR (Unique Transaction Reference) number
+- **Issuing Entity for UTR:** The receiving bank
+- **Standard Settlement Timeframe:** 1-2 business days
+- **Supported Payment Networks:** IMPS, NEFT, RTGS
+
+## System Status Meanings
+- **"Settled" / "Processed" Status:** Confirms Razorpay initiated the transfer. It does NOT guarantee the funds have hit the vendor's account yet.
+- **UTR-Confirmed Status:** Confirms actual bank settlement and credit.
+
+## Troubleshooting: Missing Credit After 1-2 Business Days
+If dashboard status is "settled" but no bank credit/UTR exists after 2 business days, the cause is one of the following:
+1. Delayed inter-bank settlement cycles.
+2. Bank-side processing failure.
+3. Reconciliation gap between Route's internal ledger and actual bank confirmation.
+
+## Troubleshooting: Amount Discrepancies
+If the Route transfer amount does not match the actual UTR-credited amount, look for:
+1. Bank-side deduction of intermediary charges.
+2. Incorrect bank account number or IFSC mapping (requires manual investigation).
