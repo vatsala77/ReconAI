@@ -1,24 +1,48 @@
-import { razorpay } from '@/lib/razorpay';
+import { getRazorpayClient, getDemoRazorpayClient } from '@/lib/razorpay';
+import { decrypt } from '@/lib/encryption';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-export async function POST() {
+export async function POST(req) {
   const session = await auth();
   if (!session?.user?.companyId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const body = await req.json().catch(() => ({}));
+  const mode = body.mode || 'own'; // 'demo' or 'own'
+
+  let razorpay;
+  let fileLabel;
+
+  if (mode === 'demo') {
+    razorpay = getDemoRazorpayClient();
+    fileLabel = `Razorpay Demo Sandbox Sync - ${new Date().toLocaleDateString('en-IN')}`;
+  } else {
+    const company = await prisma.company.findUnique({
+      where: { id: session.user.companyId },
+    });
+
+    if (!company?.razorpayKeyId || !company?.razorpayKeySecret) {
+      return NextResponse.json({ error: 'Razorpay not connected yet' }, { status: 400 });
+    }
+
+    const decryptedSecret = decrypt(company.razorpayKeySecret);
+    razorpay = getRazorpayClient(company.razorpayKeyId, decryptedSecret);
+    fileLabel = `Razorpay Live Sync - ${new Date().toLocaleDateString('en-IN')}`;
+  }
+
   const transfersResponse = await razorpay.transfers.all({ count: 50 });
 
   if (!transfersResponse.items || transfersResponse.items.length === 0) {
-    return NextResponse.json({ error: 'No transfers found in Razorpay test mode' }, { status: 400 });
+    return NextResponse.json({ error: 'No transfers found in this Razorpay test account' }, { status: 400 });
   }
 
   const batch = await prisma.uploadBatch.create({
     data: {
       companyId: session.user.companyId,
-      fileName: `Razorpay Live Sync - ${new Date().toLocaleDateString('en-IN')}`,
+      fileName: fileLabel,
       status: 'uploaded',
     },
   });

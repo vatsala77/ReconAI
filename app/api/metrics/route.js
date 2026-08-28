@@ -7,8 +7,16 @@ export async function GET(request) {
     const where = uploadBatchId ? { uploadBatchId } : {};
 
     const total = await prisma.reconciliation.count({ where });
-    const matched = await prisma.reconciliation.count({ where: { ...where, status: 'matched' } });
-    const exceptionsCount = await prisma.reconciliation.count({ where: { ...where, status: 'exception' } });
+
+    // 'resolved' counts as matched — the discrepancy was reviewed and handled by a human
+    const matched = await prisma.reconciliation.count({
+      where: { ...where, status: { in: ['matched', 'resolved'] } },
+    });
+
+    // Only genuinely still-open exceptions count against the exception total
+    const exceptionsCount = await prisma.reconciliation.count({
+      where: { ...where, status: 'exception' },
+    });
 
     const reconIds = (await prisma.reconciliation.findMany({ where, select: { id: true } })).map((r) => r.id);
     const openExceptions = await prisma.exception.count({

@@ -64,7 +64,8 @@ model Company {
   email       String   @unique
    user         User?
   createdAt   DateTime @default(now()) @map("created_at")
-
+razorpayKeyId     String? @map("razorpay_key_id")
+  razorpayKeySecret String? @map("razorpay_key_secret")
   uploadBatches UploadBatch[]
 
   @@map("companies")

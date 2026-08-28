@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import DashboardUI from '@/components/DashboardUI';
+import UploadsList from '@/components/UploadsList';
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -10,12 +10,23 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  const uploads = await prisma.uploadBatch.findMany({
-    where: { companyId: session.user.companyId },
-    orderBy: { createdAt: 'desc' },
-  });
-  
+  const [uploads, company] = await Promise.all([
+    prisma.uploadBatch.findMany({
+      where: { companyId: session.user.companyId },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.company.findUnique({
+      where: { id: session.user.companyId },
+      select: { razorpayKeyId: true },
+    }),
+  ]);
 
-
-  return <DashboardUI session={session} uploads={uploads} />;
+  return (
+    <UploadsList
+      uploads={uploads}
+      isRazorpayConnected={!!company?.razorpayKeyId}
+      razorpayKeyId={company?.razorpayKeyId || null}
+      user={session.user}
+    />
+  );
 }

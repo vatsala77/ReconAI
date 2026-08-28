@@ -13,7 +13,10 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
   const [auditLogs, setAuditLogs] = useState([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [message, setMessage] = useState('');
+  const [progressCurrent, setProgressCurrent] = useState(0);
+  const [progressTotal, setProgressTotal] = useState(0);
   const hasAutoRun = useRef(false);
+  const progressIntervalRef = useRef(null);
 
   const qs = uploadBatchId ? `?uploadBatchId=${uploadBatchId}` : '';
 
@@ -28,6 +31,51 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
     setAuditLogs(auditRes);
   }
 
+  function startFakeProgress(total) {
+    setProgressTotal(total);
+    setProgressCurrent(0);
+
+    if (total === 0) return;
+
+    const estimatedDuration = Math.min(Math.max(total * 1200, 6000), 25000);
+    const stepInterval = estimatedDuration / total;
+
+    let current = 0;
+    progressIntervalRef.current = setInterval(() => {
+      current += 1;
+      if (current >= total) {
+        current = total - 1;
+      }
+      setProgressCurrent(current);
+    }, stepInterval);
+  }
+
+  function stopFakeProgress(finalTotal) {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+    setProgressCurrent(finalTotal);
+  }
+
+  async function runReconcileWithProgress() {
+    let total = 0;
+    try {
+      const info = await fetch(`/api/upload/batch-info${qs}`).then((r) => r.json());
+      total = info.orderCount || 0;
+    } catch (e) {
+      total = 0;
+    }
+
+    startFakeProgress(total);
+
+    try {
+      await fetch(`/api/reconcile${qs}`, { method: 'POST' });
+    } finally {
+      stopFakeProgress(total);
+    }
+  }
+
   async function handleReconcile(force = false) {
     if (!force && metrics?.total > 0) {
       setMessage('Data already reconciled. No new inputs to process.');
@@ -37,7 +85,7 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
     setAnalyzing(true);
     setMessage('');
     try {
-      await fetch(`/api/reconcile${qs}`, { method: 'POST' });
+      await runReconcileWithProgress();
       await loadData();
     } finally {
       setAnalyzing(false);
@@ -50,20 +98,42 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
       if (autoRun && !hasAutoRun.current && res.total === 0) {
         hasAutoRun.current = true;
         setAnalyzing(true);
-        await fetch(`/api/reconcile${qs}`, { method: 'POST' });
+        await runReconcileWithProgress();
         setAnalyzing(false);
       }
       await loadData();
     }
     init();
+
+    return () => {
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploadBatchId]);
 
   if (!metrics || analyzing) {
+    const showCounter = progressTotal > 0;
+    const percent = showCounter ? Math.round((progressCurrent / progressTotal) * 100) : 0;
+
     return (
       <div className="analyzing-state">
         <div className="spinner" />
-        <p>{analyzing ? 'Analyzing your settlement data — this takes 15–30 seconds…' : 'Loading…'}</p>
+        {analyzing ? (
+          <>
+            <p>
+              {showCounter
+                ? `Processing order ${progressCurrent} of ${progressTotal}…`
+                : 'Analyzing your settlement data — this takes 15–30 seconds…'}
+            </p>
+            {showCounter && (
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: `${percent}%` }} />
+              </div>
+            )}
+          </>
+        ) : (
+          <p>Loading…</p>
+        )}
         <style jsx>{`
           .analyzing-state {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -74,6 +144,12 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
             border-radius: 50%; animation: spin 0.8s linear infinite;
           }
           p { color: #c1c6d7; font-size: 14px; }
+          .progress-track {
+            width: 240px; height: 5px; background: #1f2942; border-radius: 999px; overflow: hidden;
+          }
+          .progress-fill {
+            height: 100%; background: #0070f3; transition: width 0.3s ease;
+          }
           @keyframes spin { to { transform: rotate(360deg); } }
         `}</style>
       </div>

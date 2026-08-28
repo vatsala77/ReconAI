@@ -78,7 +78,7 @@ export async function POST(request) {
       ? (await ragStore.query(question, 1)).map((d) => d.text).join('\n\n')
       : '';
 
-    const prompt = `You are ReconAI's assistant. Answer using ONLY the data below. Be concise (2-3 sentences max), specific, cite order IDs/amounts where relevant.
+    const prompt = `You are ReconAI's assistant for a reconciliation batch. You can answer general questions naturally, but when the question is about this batch's data, orders, exceptions, or reconciliation, you must ONLY use the data provided below — never invent numbers or order details.
 
 ${contextBlock}
 
@@ -86,13 +86,17 @@ ${relevantRules ? `RELEVANT REGULATION: ${relevantRules}` : ''}
 
 HISTORY: ${history.slice(-4).map((h) => `${h.role}: ${h.content}`).join('\n')}
 
-QUESTION: ${question}`;
+QUESTION: ${question}
+
+Instructions:
+- If the question is about this batch (orders, exceptions, amounts, reconciliation, tax rules), answer strictly from the data/regulation above. Be concise (2-3 sentences), cite order IDs/amounts where relevant.
+- If the question is general/unrelated to the batch (e.g. basic math, greetings, general knowledge), just answer it directly and naturally — don't force it into the batch context.`;
 
     const completion = await groq.chat.completions.create({
       model: 'openai/gpt-oss-120b',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
-      max_tokens: 250,
+      max_tokens: 500,
     });
 
     const answer = completion.choices[0].message.content;

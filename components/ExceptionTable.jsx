@@ -14,8 +14,57 @@ const CATEGORY_STYLES = {
   tax_line_discrepancy: { label: 'Tax Line Discrepancy', color: '#ff6b6b' },
 };
 
-export default function ExceptionTable({ exceptions }) {
+export default function ExceptionTable({ exceptions: initialExceptions }) {
+  const [exceptions, setExceptions] = useState(initialExceptions);
   const [expandedId, setExpandedId] = useState(null);
+  const [suggestions, setSuggestions] = useState({}); // { [exceptionId]: { suggestedAction, reasoning } }
+  const [loadingSuggestion, setLoadingSuggestion] = useState(null);
+  const [resolving, setResolving] = useState(null);
+
+  async function handleSuggest(exceptionId) {
+    setLoadingSuggestion(exceptionId);
+    try {
+      const res = await fetch(`/api/exceptions/${exceptionId}/suggest-action`, { method: 'POST' });
+      const data = await res.json();
+      setSuggestions((prev) => ({ ...prev, [exceptionId]: data }));
+    } catch (err) {
+      setSuggestions((prev) => ({
+        ...prev,
+        [exceptionId]: { suggestedAction: 'Manual review required', reasoning: 'Could not generate a suggestion right now.' },
+      }));
+    } finally {
+      setLoadingSuggestion(null);
+    }
+  }
+
+  async function handleApprove(exceptionId) {
+    const suggestion = suggestions[exceptionId];
+    if (!suggestion) return;
+
+    setResolving(exceptionId);
+    try {
+      const res = await fetch(`/api/exceptions/${exceptionId}/resolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: suggestion.suggestedAction, reasoning: suggestion.reasoning }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setExceptions((prev) =>
+          prev.map((e) =>
+            e.id === exceptionId
+              ? { ...e, status: 'resolved', resolvedAt: data.resolvedAt, resolvedBy: data.resolvedBy, resolutionAction: suggestion.suggestedAction }
+              : e
+          )
+        );
+      }
+    } catch (err) {
+      alert('Failed to resolve exception. Please try again.');
+    } finally {
+      setResolving(null);
+    }
+  }
 
   return (
     <div className="panel">
@@ -25,15 +74,20 @@ export default function ExceptionTable({ exceptions }) {
         const style = CATEGORY_STYLES[exc.category] || { label: exc.category, color: '#7c8493' };
         const isOpen = expandedId === exc.id;
         const orderId = exc.reconciliation?.orderId;
+        const isResolved = exc.status === 'resolved';
+        const suggestion = suggestions[exc.id];
+
         return (
           <div key={exc.id}>
             <button className="row" onClick={() => setExpandedId(isOpen ? null : exc.id)}>
               <div className="left">
                 <span className="badge" style={{ color: style.color, background: `${style.color}1A` }}>{style.label}</span>
                 <span className="order-id">{orderId}</span>
+                {isResolved && <span className="resolved-badge">✓ Resolved</span>}
               </div>
               <span className="conf">{((exc.confidenceScore || 0) * 100).toFixed(0)}% confidence</span>
             </button>
+
             {isOpen && (
               <div className="detail">
                 <p>{exc.aiExplanation}</p>
@@ -57,6 +111,39 @@ export default function ExceptionTable({ exceptions }) {
                     </tbody>
                   </table>
                 )}
+
+                {/* Explainable Action Agent section */}
+                <div className="action-section">
+                  {isResolved ? (
+                    <div className="resolved-trail">
+                      <p className="resolved-line">
+                        ✓ Resolved by <strong>{exc.resolvedBy}</strong> on {new Date(exc.resolvedAt).toLocaleString('en-IN')}
+                      </p>
+                      <p className="resolved-action">Action taken: {exc.resolutionAction}</p>
+                    </div>
+                  ) : suggestion ? (
+                    <div className="suggestion-box">
+                      <p className="suggestion-label">Suggested Resolution</p>
+                      <p className="suggestion-action">{suggestion.suggestedAction}</p>
+                      <p className="suggestion-reasoning">{suggestion.reasoning}</p>
+                      <button
+                        className="approve-btn"
+                        onClick={() => handleApprove(exc.id)}
+                        disabled={resolving === exc.id}
+                      >
+                        {resolving === exc.id ? 'Resolving…' : '✓ Approve & Resolve'}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="suggest-btn"
+                      onClick={() => handleSuggest(exc.id)}
+                      disabled={loadingSuggestion === exc.id}
+                    >
+                      {loadingSuggestion === exc.id ? 'Generating suggestion…' : '✦ Suggest Resolution'}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -76,6 +163,10 @@ export default function ExceptionTable({ exceptions }) {
         .left { display: flex; align-items: center; gap: 12px; }
         .badge { font-size: 11px; font-family: 'Courier New', monospace; padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
         .order-id { font-size: 13px; font-family: 'Courier New', monospace; color: #e4e7ec; }
+        .resolved-badge {
+          font-size: 10.5px; color: #34D399; background: rgba(52,211,153,0.1);
+          padding: 3px 8px; border-radius: 6px; font-weight: 600;
+        }
         .conf { font-size: 12px; color: #7c8493; font-family: 'Courier New', monospace; }
         .detail { padding: 0 20px 16px 20px; font-size: 13.5px; color: #c1c6d7; line-height: 1.6; }
         .amt { margin-top: 8px; font-size: 12px; color: #7c8493; font-family: 'Courier New', monospace; }
@@ -97,6 +188,59 @@ export default function ExceptionTable({ exceptions }) {
           text-transform: uppercase;
           font-size: 10px;
         }
+
+        .action-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid #1f2942; }
+
+        .suggest-btn {
+          background: #1f2942;
+          border: 1px solid #2a344e;
+          color: #aec6ff;
+          font-size: 13px;
+          font-weight: 600;
+          padding: 9px 16px;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .suggest-btn:hover:not(:disabled) { background: #2a344e; border-color: #0070f3; }
+        .suggest-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .suggestion-box {
+          background: #0d1730;
+          border: 1px solid #253154;
+          border-radius: 10px;
+          padding: 14px 16px;
+        }
+        .suggestion-label {
+          font-size: 10px; font-weight: 700; color: #7c8493;
+          text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px 0;
+        }
+        .suggestion-action { font-size: 14px; font-weight: 600; color: #ffffff; margin: 0 0 6px 0; }
+        .suggestion-reasoning { font-size: 12.5px; color: #c1c6d7; line-height: 1.5; margin: 0 0 14px 0; }
+
+        .approve-btn {
+          background: #34D399;
+          color: #0B0E14;
+          border: none;
+          font-size: 13px;
+          font-weight: 700;
+          padding: 9px 18px;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .approve-btn:hover:not(:disabled) { background: #2bc08a; }
+        .approve-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .resolved-trail {
+          background: rgba(52,211,153,0.06);
+          border: 1px solid rgba(52,211,153,0.2);
+          border-radius: 10px;
+          padding: 12px 16px;
+        }
+        .resolved-line { font-size: 12.5px; color: #34D399; margin: 0 0 4px 0; }
+        .resolved-line strong { color: #ffffff; }
+        .resolved-action { font-size: 12.5px; color: #c1c6d7; margin: 0; }
       `}</style>
     </div>
   );

@@ -9,14 +9,12 @@ const BANK_FIELDS = ['utr', 'transfer_id', 'amount_credited', 'credited_at', 'st
 const GST_FIELDS = ['vendor_gstin', 'order_id', 'tcs_reported', 'filing_period', 'status'];
 
 export default function UploadPage() {
-  const [uploadMode, setUploadMode] = useState('single'); // 'single' or 'separate'
+  const [uploadMode, setUploadMode] = useState('single');
   const [step, setStep] = useState('upload');
 
-  // Single-file mode
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('');
 
-  // Separate-files mode
   const [ordersFile, setOrdersFile] = useState(null);
   const [transfersFile, setTransfersFile] = useState(null);
   const [bankFile, setBankFile] = useState(null);
@@ -121,24 +119,30 @@ export default function UploadPage() {
   function renderMappingSection(title, fields, mapping, setMapping, headers) {
     if (!headers || headers.length === 0) return null;
     return (
-      <div className="mapping-section">
-        <h3>{title}</h3>
-        {fields.map((field) => (
-          <div key={field} className="mapping-row">
-            <label className={isLowConfidence(field, mapping) ? 'label-warn' : ''}>
-              {field} {isLowConfidence(field, mapping) && '⚠ not detected'}
-            </label>
-            <select
-              value={mapping[field] || ''}
-              onChange={(e) => setMapping({ ...mapping, [field]: e.target.value })}
-            >
-              <option value="">— none —</option>
-              {headers.map((h) => (
-                <option key={h} value={h}>{h}</option>
-              ))}
-            </select>
-          </div>
-        ))}
+      <div className="mapping-card">
+        <h3 className="card-title">{title}</h3>
+        <div className="fields-list">
+          {fields.map((field) => (
+            <div key={field} className="field-row">
+              <div className="field-label-group">
+                <span className="field-name">{field}</span>
+                {isLowConfidence(field, mapping) && (
+                  <span className="warn-badge">⚠️ not detected</span>
+                )}
+              </div>
+              <select
+                className="select-box"
+                value={mapping[field] || ''}
+                onChange={(e) => setMapping({ ...mapping, [field]: e.target.value })}
+              >
+                <option value="">— none —</option>
+                {headers.map((h) => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -189,8 +193,10 @@ export default function UploadPage() {
 
               <form onSubmit={handlePreview}>
                 {uploadMode === 'single' ? (
-                  <>
-                    <label>Excel File (.xlsx) — Orders, Transfers, and optionally Bank Settlements &amp; GST Filings as separate sheets</label>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Excel File (.xlsx) — Orders, Transfers, and optionally Bank Settlements &amp; GST Filings
+                    </label>
                     <div className="file-drop">
                       <input
                         type="file"
@@ -203,24 +209,35 @@ export default function UploadPage() {
                       />
                       <label htmlFor="file-input" className="file-label">
                         <span className="file-icon">📄</span>
-                        <span>{fileName || 'Click to choose a file, or drag it here'}</span>
+                        <div className="file-text-group">
+                          <span className="file-main-text">{fileName || 'Choose a file or drag it here'}</span>
+                          <span className="file-sub-text">XLSX, XLS files supported</span>
+                        </div>
                       </label>
                     </div>
-                  </>
+                  </div>
                 ) : (
-                  <>
-                    <label>Orders File (required)</label>
-                    <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setOrdersFile(e.target.files[0])} className="simple-file-input" />
+                  <div className="separate-files-grid">
+                    <div className="form-group">
+                      <label className="form-label">Orders File <span className="req">*</span></label>
+                      <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setOrdersFile(e.target.files[0])} className="simple-file-input" />
+                    </div>
 
-                    <label>Transfers File (required)</label>
-                    <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setTransfersFile(e.target.files[0])} className="simple-file-input" />
+                    <div className="form-group">
+                      <label className="form-label">Transfers File <span className="req">*</span></label>
+                      <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setTransfersFile(e.target.files[0])} className="simple-file-input" />
+                    </div>
 
-                    <label>Bank Settlements (optional)</label>
-                    <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setBankFile(e.target.files[0])} className="simple-file-input" />
+                    <div className="form-group">
+                      <label className="form-label">Bank Settlements <span className="opt">(optional)</span></label>
+                      <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setBankFile(e.target.files[0])} className="simple-file-input" />
+                    </div>
 
-                    <label>GST Filings (optional)</label>
-                    <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setGstFile(e.target.files[0])} className="simple-file-input" />
-                  </>
+                    <div className="form-group">
+                      <label className="form-label">GST Filings <span className="opt">(optional)</span></label>
+                      <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setGstFile(e.target.files[0])} className="simple-file-input" />
+                    </div>
+                  </div>
                 )}
 
                 {error && <p className="error-text">{error}</p>}
@@ -243,10 +260,12 @@ export default function UploadPage() {
                 We&apos;ve matched your columns automatically. Review and adjust anything below.
               </p>
 
-              {renderMappingSection('Orders', ORDER_FIELDS, orderMapping, setOrderMapping, previewData.orderHeaders)}
-              {renderMappingSection('Transfers', TRANSFER_FIELDS, transferMapping, setTransferMapping, previewData.transferHeaders)}
-              {renderMappingSection('Bank Settlements', BANK_FIELDS, bankMapping, setBankMapping, previewData.bankHeaders)}
-              {renderMappingSection('GST Filings', GST_FIELDS, gstMapping, setGstMapping, previewData.gstHeaders)}
+              <div className="mapping-grid-2col">
+                {renderMappingSection('Orders', ORDER_FIELDS, orderMapping, setOrderMapping, previewData.orderHeaders)}
+                {renderMappingSection('Transfers', TRANSFER_FIELDS, transferMapping, setTransferMapping, previewData.transferHeaders)}
+                {renderMappingSection('Bank Settlements', BANK_FIELDS, bankMapping, setBankMapping, previewData.bankHeaders)}
+                {renderMappingSection('GST Filings', GST_FIELDS, gstMapping, setGstMapping, previewData.gstHeaders)}
+              </div>
 
               {error && <p className="error-text">{error}</p>}
 
@@ -261,147 +280,254 @@ export default function UploadPage() {
         </div>
       </main>
 
-      <style jsx>{`
-        :global(body) {
-          background-color: #07122a;
-          color: #ffffff;
+      <style jsx global>{`
+        body {
+          background-color: #07122a !important;
+          color: #ffffff !important;
           overflow-x: hidden;
           background-image:
-            linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 50px 50px;
-          font-family: 'Segoe UI', -apple-system, sans-serif;
+            linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px) !important;
+          background-size: 50px 50px !important;
+          font-family: 'Segoe UI', -apple-system, sans-serif !important;
         }
+
         .ambient-glow {
-          position: absolute; width: 800px; height: 800px;
-          background: radial-gradient(circle, rgba(0,112,243,0.08) 0%, rgba(7,18,42,0) 60%);
-          border-radius: 50%; z-index: -1; pointer-events: none;
+          position: absolute;
+          width: 800px;
+          height: 800px;
+          background: radial-gradient(circle, rgba(0, 112, 243, 0.08) 0%, rgba(7, 18, 42, 0) 60%);
+          border-radius: 50%;
+          z-index: -1;
+          pointer-events: none;
         }
         .ambient-glow.top { top: -20%; left: -10%; }
         .ambient-glow.bottom { bottom: 10%; right: -10%; }
 
         .navbar {
-          position: fixed; top: 0; width: 100%; z-index: 50;
-          background: rgba(7,18,42,0.9); backdrop-filter: blur(12px);
+          position: fixed;
+          top: 0;
+          width: 100%;
+          z-index: 50;
+          background: rgba(7, 18, 42, 0.9);
+          backdrop-filter: blur(12px);
           border-bottom: 1px solid #151f37;
         }
         .navbar-inner { display: flex; align-items: center; padding: 16px 24px; max-width: 1280px; margin: 0 auto; }
-        .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; }
+        .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
         .brand-icon { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, #0070f3, #0059c5); }
-        .brand-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; }
+        .brand-name { font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
 
-        .upload-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 120px 24px 60px; }
-        .upload-card {
-          background: #101b33; border: 1px solid #1f2942; border-radius: 24px;
-          padding: 44px; max-width: 580px; width: 100%; max-height: 82vh; overflow-y: auto;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        .upload-page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 120px 24px 60px;
         }
-        .upload-card::-webkit-scrollbar { width: 6px; }
-        .upload-card::-webkit-scrollbar-track { background: #101b33; }
-        .upload-card::-webkit-scrollbar-thumb { background: #2a344e; border-radius: 4px; }
+        
+        .upload-card {
+          background: #101b33 !important;
+          border: 1px solid #1f2942 !important;
+          border-radius: 24px !important;
+          padding: 40px !important;
+          max-width: 1100px !important;
+          width: 100% !important;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1) !important;
+          box-sizing: border-box;
+        }
 
         .badge {
-          display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px;
-          color: #aec6ff; font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 20px;
+          color: #aec6ff;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.15em;
         }
-        .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #aec6ff; box-shadow: 0 0 8px rgba(0,112,243,0.8); }
+        .badge-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: #aec6ff;
+          box-shadow: 0 0 8px rgba(0,112,243,0.8);
+        }
 
         h1 { color: #ffffff; font-size: 32px; margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.01em; }
-        h3 { color: #ffffff; font-size: 16px; margin: 0 0 16px 0; font-weight: 700; border-bottom: 1px solid #2a344e; padding-bottom: 8px; }
-        .subtitle { color: #c1c6d7; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0; }
+        .subtitle { color: #c1c6d7; font-size: 16px; line-height: 1.6; margin: 0 0 28px 0; }
 
-        .mode-toggle { display: flex; gap: 8px; margin-bottom: 24px; background: #0d1730; padding: 4px; border-radius: 12px; }
+        .mode-toggle { display: flex; gap: 6px; margin-bottom: 28px; background: #151f37; padding: 4px; border-radius: 10px; border: 1px solid #2a344e; }
         .mode-btn {
-          flex: 1; padding: 10px; border-radius: 9px; border: none; background: transparent;
-          color: #7c8493; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+          flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent;
+          color: #c1c6d7; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
         }
-        .mode-btn.active { background: #0070f3; color: #ffffff; }
+        .mode-btn.active { background: #0070f3; color: #ffffff; box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3); }
 
-        label { display: block; color: #ffffff; font-size: 13px; font-weight: 500; margin-bottom: 8px; margin-top: 18px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; color: #ffffff; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+        .req { color: #f87171; }
+        .opt { color: #6b7690; font-weight: 400; }
+
+        .separate-files-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
 
         .simple-file-input {
-          width: 100%; padding: 10px 14px; background: #151f37; border: 1px solid #2a344e;
-          border-radius: 10px; color: #c1c6d7; font-size: 13px;
+          width: 100%; padding: 12px 16px; background: #151f37; border: 1px solid #2a344e;
+          border-radius: 10px; color: #ffffff; font-size: 14px; transition: border-color 0.2s;
         }
 
-        .file-drop { position: relative; margin-top: 8px; }
-        .file-drop input[type="file"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .file-drop { position: relative; margin-top: 4px; }
+        .file-drop input[type="file"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
         .file-label {
-          display: flex; align-items: center; gap: 12px; padding: 16px; background: #151f37;
-          border: 1.5px dashed #2a344e; border-radius: 10px; color: #c1c6d7; font-size: 14px;
-          cursor: pointer; transition: border-color 0.2s, background 0.2s; margin: 0;
+          display: flex; align-items: center; gap: 16px; padding: 24px; background: #151f37;
+          border: 1.5px dashed #2a344e; border-radius: 12px; color: #ffffff;
+          cursor: pointer; transition: all 0.2s ease;
         }
-        .file-drop:hover .file-label { border-color: #0070f3; background: #17203c; }
-        .file-icon { font-size: 20px; }
+        .file-icon { font-size: 28px; }
+        .file-text-group { display: flex; flex-direction: column; gap: 2px; }
+        .file-main-text { font-size: 14px; font-weight: 600; color: #ffffff; }
+        .file-sub-text { font-size: 12px; color: #6b7690; }
 
         .error-text {
           color: #f87171; font-size: 13px; margin: 16px 0 0 0; padding: 10px 14px;
-          background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); border-radius: 8px;
+          background: rgba(248, 113, 113, 0.08); border: 1px solid rgba(248, 113, 113, 0.2); border-radius: 8px;
         }
 
         .btn-primary {
-          background: #0070f3; box-shadow: 0 4px 14px rgba(0,112,243,0.2); color: white;
-          padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 15px;
-          display: flex; align-items: center; justify-content: center; gap: 8px;
-          transition: all 0.3s ease; border: none; cursor: pointer; width: 100%;
+          background: #0070f3; color: white; padding: 12px 20px; border-radius: 12px;
+          font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center;
+          transition: all 0.3s ease; border: none; cursor: pointer; width: 100%; margin-top: 28px;
+          box-shadow: 0 4px 14px rgba(0, 112, 243, 0.2);
         }
-        .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(0,112,243,0.35); transform: translateY(-2px); background: #0059c5; }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(0, 112, 243, 0.35); transform: translateY(-2px); background: #0059c5; }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-ghost {
-          background: #1f2942; border: 1px solid #2a344e; color: #ffffff;
+          background: #151f37; border: 1px solid #2a344e; color: #ffffff;
           padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 15px;
-          display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; cursor: pointer;
+          display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
-        .btn-ghost:hover { background: #2a344e; border-color: #414754; }
 
-        form button[type="submit"] { margin-top: 28px; }
-
-        .mapping-section { background: #151f37; border: 1px solid #2a344e; border-radius: 14px; padding: 24px; margin-bottom: 24px; }
-
-        .mapping-row {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          margin-bottom: 16px;
-          min-width: 0;
+        /* ------------------------------------------------------------- */
+        /* MATCHING LOGIN CARD THEME & 2-COLUMN GRID FOR STEP 2 (MAPPING) */
+        /* ------------------------------------------------------------- */
+        .mapping-grid-2col {
+          display: grid !important;
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 20px !important;
+          width: 100% !important;
+          margin-bottom: 24px !important;
+          box-sizing: border-box !important;
         }
-        .mapping-row:last-child { margin-bottom: 0; }
-        .mapping-row label {
-          min-width: 0;
-          margin: 0;
-          font-size: 11px;
-          font-weight: 600;
-          color: #9db4e0;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-          overflow-wrap: anywhere;
-        }
-        .label-warn { color: #f5a623 !important; }
 
-        select {
-          width: 100%;
-          min-width: 0;
-          padding: 11px 36px 11px 14px;
-          background-color: #0d1730;
-          border: 1px solid #2a344e;
-          border-radius: 8px;
-          color: #ffffff;
-          font-size: 14px;
-          transition: border-color 0.2s;
-          appearance: none;
-          -webkit-appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237c8493' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 14px center;
+        .mapping-card {
+          background: #151f37 !important; /* Exact input/inner card background from LoginPage */
+          border: 1px solid #2a344e !important; /* Matching border color */
+          border-radius: 16px !important;
+          padding: 20px !important;
+          display: flex !important;
+          flex-direction: column !important;
+          box-sizing: border-box !important;
         }
-        select:focus { outline: none; border-color: #0070f3; }
-        select option { background: #0d1730; color: #ffffff; }
 
-        .mapping-actions { display: flex; gap: 12px; margin-top: 28px; }
-        .mapping-actions button { flex: 1; }
-        @media (max-width: 560px) {
-          .upload-card { padding: 28px 20px; }
+        .card-title {
+          color: #ffffff !important;
+          font-size: 18px !important;
+          font-weight: 700 !important;
+          margin: 0 0 16px 0 !important;
+          padding-bottom: 8px !important;
+          border-bottom: 1px solid #2a344e !important;
+        }
+
+        .fields-list {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 10px !important;
+          width: 100% !important;
+        }
+
+        .field-row {
+          display: flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          gap: 12px !important;
+          width: 100% !important;
+          background: #101b33 !important;
+          border: 1px solid #1f2942 !important;
+          border-radius: 8px !important;
+          padding: 8px 12px !important;
+          box-sizing: border-box !important;
+        }
+
+        .field-label-group {
+          display: flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          flex: 1 !important;
+          min-width: 0 !important;
+        }
+
+        .field-name {
+          font-family: monospace !important;
+          font-size: 13px !important;
+          color: #ffffff !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+
+        .warn-badge {
+          font-size: 11px !important;
+          color: #fbbf24 !important;
+          white-space: nowrap !important;
+        }
+
+        .select-box {
+          width: 170px !important;
+          flex-shrink: 0 !important;
+          padding: 6px 12px !important;
+          background-color: #151f37 !important;
+          border: 1px solid #2a344e !important;
+          border-radius: 8px !important;
+          color: #ffffff !important;
+          font-size: 13px !important;
+          outline: none !important;
+          cursor: pointer !important;
+        }
+        .select-box:focus {
+          border-color: #0070f3 !important;
+          box-shadow: 0 0 0 3px rgba(0,112,243,0.15) !important;
+        }
+
+      /* Buttons wrapper alignment */
+.mapping-actions {
+  display: flex !important;
+  justify-content: flex-end !important; /* Buttons ko right-align karne ke liye */
+  align-items: center !important;
+  gap: 12px !important;
+  margin-top: 28px !important;
+  width: 100% !important;
+}
+
+/* Back button ka clean compact size */
+.mapping-actions .btn-ghost {
+  width: auto !important;
+  min-width: 120px !important;
+  padding: 10px 20px !important;
+  margin-top: 0 !important;
+}
+
+/* Confirm & Analyze button ka matching size */
+.mapping-actions .btn-primary {
+  width: auto !important;
+  min-width: 180px !important;
+  padding: 10px 24px !important;
+  margin-top: 0 !important;
+}
+        @media (max-width: 800px) {
+          .mapping-grid-2col {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
     </>

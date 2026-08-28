@@ -16,18 +16,47 @@ const ROUTE_LABELS = {
   general: 'General Query',
 };
 
+const DEFAULT_MESSAGE = { role: 'assistant', content: "Ask me anything about this reconciliation batch — or tap a suggestion below to get started." };
+
 export default function ChatPanel({ uploadBatchId }) {
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Ask me anything about this reconciliation batch — or tap a suggestion below to get started." },
-  ]);
+  const storageKey = `reconai_chat_${uploadBatchId}`;
+
+  const [messages, setMessages] = useState(() => {
+    if (typeof window === 'undefined') return [DEFAULT_MESSAGE];
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      // ignore parse errors, fall through to default
+    }
+    return [DEFAULT_MESSAGE];
+  });
+
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      const parsed = saved ? JSON.parse(saved) : null;
+      return !parsed || parsed.length <= 1;
+    } catch (e) {
+      return true;
+    }
+  });
   const scrollRef = useRef(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(messages));
+    } catch (e) {
+      // localStorage full or unavailable — fail silently, chat still works, just won't persist
+    }
+  }, [messages, storageKey]);
 
   async function sendMessage(overrideText) {
     const text = overrideText || input;
@@ -69,6 +98,16 @@ export default function ChatPanel({ uploadBatchId }) {
     }
   }
 
+  function handleClearChat() {
+    setMessages([DEFAULT_MESSAGE]);
+    setShowSuggestions(true);
+    try {
+      localStorage.removeItem(storageKey);
+    } catch (e) {
+      // ignore
+    }
+  }
+
   return (
     <div className="chat-panel">
       <div className="chat-header">
@@ -77,6 +116,7 @@ export default function ChatPanel({ uploadBatchId }) {
           <p className="chat-title">Talk to your data</p>
           <p className="chat-subtitle">AI-powered, grounded in this batch</p>
         </div>
+        <button className="clear-btn" onClick={handleClearChat} title="Clear conversation">🗑</button>
       </div>
 
       <div className="chat-messages" ref={scrollRef}>
@@ -151,6 +191,18 @@ export default function ChatPanel({ uploadBatchId }) {
         }
         .chat-title { font-size: 14px; font-weight: 600; color: #ffffff; margin: 0; }
         .chat-subtitle { font-size: 12px; color: #7c8493; margin: 2px 0 0 0; }
+        .clear-btn {
+          margin-left: auto;
+          background: transparent;
+          border: none;
+          color: #7c8493;
+          cursor: pointer;
+          font-size: 14px;
+          padding: 6px;
+          border-radius: 6px;
+          flex-shrink: 0;
+        }
+        .clear-btn:hover { background: #1f2942; color: #f87171; }
 
         .chat-messages {
           flex: 1;
