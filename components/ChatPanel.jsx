@@ -313,7 +313,7 @@ export default function ChatPanel({ uploadBatchId }) {
         .chat-input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
 
         /* ===== LIGHT MODE ===== */
-        :global(html[data-theme="light"]) .chat-panel { background: #ffffff; border-color: #e2e8f0; }
+        :global(html[data-theme="light"]) .chat-panel { background: #f0f9ff; border-color: #7dd3fc; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08); }
         :global(html[data-theme="light"]) .chat-header { border-bottom-color: #e2e8f0; background: linear-gradient(180deg, rgba(0,112,243,0.03), transparent); }
         :global(html[data-theme="light"]) .chat-title { color: #0f172a; }
         :global(html[data-theme="light"]) .chat-subtitle { color: #64748b; }

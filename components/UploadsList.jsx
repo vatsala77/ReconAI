@@ -129,6 +129,9 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
                   <button className="disconnect-link" onClick={handleDisconnect}>Disconnect</button>
                 </div>
               )}
+              <button className="btn-demo" onClick={() => runSync('demo')} disabled={syncing}>
+                {syncing ? <><RefreshCw size={14} className="spin" /> Syncing…</> : <>🧪 Try Demo</>}
+              </button>
               <button className="btn-ghost" onClick={handleSyncClick} disabled={syncing}>
                 {syncing ? <><RefreshCw size={14} className="spin" /> Syncing…</> : connected ? <><RefreshCw size={14} /> Sync from Razorpay</> : <><Link2 size={14} /> Connect Razorpay</>}
               </button>
@@ -136,12 +139,26 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
             </div>
           </div>
 
+          <div className="demo-file-banner">
+            <span className="demo-file-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </span>
+            <span className="demo-file-text">
+              Demo dataset: <a href="/reconai_full_demo_batch_50plus.xlsx" target="_blank" rel="noopener noreferrer" className="file-link"><code>reconai_full_demo_batch_50plus.xlsx</code> <span className="open-icon">↗</span></a> — 52 orders, 51 transfers, 43 bank settlements, 43 GST filings across 4 sheets
+            </span>
+          </div>
+
           {uploads.length === 0 ? (
             <div className="empty-state-card">
               <div className="empty-icon"><FileText size={40} strokeWidth={1.5} /></div>
               <p className="empty-title">No uploads yet</p>
               <p className="empty-subtitle">Upload your first route settlement file to start reconciling.</p>
-              <button className="btn-primary" onClick={() => router.push('/upload')}><Plus size={14} /> Upload your first file</button>
+              <div className="empty-actions">
+                <button className="btn-primary" onClick={() => router.push('/upload')}><Plus size={14} /> Upload your first file</button>
+              </div>
+              <div className="empty-demo-hint">
+                <span>🧪</span> Or click <strong>"Try Demo"</strong> above to load the bundled seed file (<code>reconai_full_demo_batch_50plus.xlsx</code>) with 52 sample orders and full reconciliation data.
+              </div>
             </div>
           ) : (
             <div className="uploads-list">
@@ -349,6 +366,21 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
         .spin { animation: spin 1s linear infinite; }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        .btn-demo {
+          display: inline-flex; align-items: center; gap: 6px;
+          background: rgba(0,112,243,0.08);
+          border: 1px solid rgba(0,112,243,0.25);
+          color: #60a5fa;
+          padding: 11px 20px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .btn-demo:hover:not(:disabled) { background: rgba(0,112,243,0.16); border-color: rgba(0,112,243,0.45); }
+        .btn-demo:disabled { opacity: 0.5; cursor: not-allowed; }
+
         .btn-ghost {
           display: inline-flex; align-items: center; gap: 6px;
           background: var(--bg-card-elevated);
@@ -375,6 +407,70 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
         .empty-icon { font-size: 40px; margin-bottom: 16px; }
         .empty-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0 0 6px 0; }
         .empty-subtitle { font-size: 14px; color: var(--text-secondary); margin: 0 0 24px 0; }
+        .empty-actions { margin-bottom: 20px; }
+        .empty-demo-hint {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-size: 12px; color: var(--text-muted);
+          background: rgba(0,112,243,0.04);
+          border: 1px dashed rgba(0,112,243,0.2);
+          border-radius: 10px;
+          padding: 10px 16px;
+          max-width: 480px;
+          line-height: 1.5;
+          text-align: left;
+        }
+        .empty-demo-hint code {
+          background: var(--bg-card-elevated);
+          padding: 1px 5px;
+          border-radius: 4px;
+          font-size: 11px;
+        }
+
+        .demo-file-banner {
+          display: flex; align-items: center; gap: 10px;
+          padding: 10px 16px;
+          background: rgba(0,112,243,0.04);
+          border: 1px solid rgba(0,112,243,0.12);
+          border-radius: 10px;
+          margin-bottom: 24px;
+        }
+        .demo-file-icon {
+          color: #60a5fa;
+          flex-shrink: 0;
+          display: flex;
+        }
+        .demo-file-text {
+          font-size: 12px; color: var(--text-muted); line-height: 1.5;
+        }
+        .demo-file-text code {
+          background: var(--bg-card-elevated);
+          padding: 1px 5px;
+          border-radius: 4px;
+          font-size: 11px;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+        .file-link {
+          color: inherit;
+          text-decoration: none;
+          border-bottom: 1.5px dashed rgba(96,165,250,0.4);
+          transition: all 0.15s;
+          cursor: pointer;
+        }
+        .file-link:hover {
+          border-bottom-color: #60a5fa;
+          color: #60a5fa;
+        }
+        .file-link:hover code {
+          color: #60a5fa;
+          background: rgba(96,165,250,0.1);
+        }
+        .open-icon {
+          font-size: 10px;
+          opacity: 0.6;
+          margin-left: 2px;
+        }
+        .file-link:hover .open-icon { opacity: 1; }
 
         .uploads-list { display: flex; flex-direction: column; gap: 12px; }
         .upload-item-left { display: flex; align-items: center; gap: 14px; }
@@ -439,7 +535,12 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
 
         :global(html[data-theme='light']) .btn-primary { background: #2563eb; box-shadow: 0 4px 14px rgba(37,99,235,0.2); }
         :global(html[data-theme='light']) .btn-primary:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(37,99,235,0.3); }
+        :global(html[data-theme='light']) .btn-demo { background: rgba(37,99,235,0.06); border-color: rgba(37,99,235,0.2); color: #2563eb; }
+        :global(html[data-theme='light']) .btn-demo:hover:not(:disabled) { background: rgba(37,99,235,0.12); border-color: rgba(37,99,235,0.35); }
         :global(html[data-theme='light']) .empty-icon { color: var(--text-muted); }
+        :global(html[data-theme='light']) .demo-file-banner { background: rgba(37,99,235,0.04); border-color: rgba(37,99,235,0.12); }
+        :global(html[data-theme='light']) .demo-file-icon { color: #2563eb; }
+        :global(html[data-theme='light']) .empty-demo-hint { background: rgba(37,99,235,0.04); border-color: rgba(37,99,235,0.15); }
       `}</style>
     </>
   );

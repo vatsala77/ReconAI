@@ -7,7 +7,9 @@ import AuditTimeline from './AuditTimeline';
 import ReconcileButton from './ReconcileButton';
 import ChatPanel from './ChatPanel';
 import HealthSummaryCard from './HealthSummaryCard';
+import ChartsPanel from './ChartsPanel';
 import { downloadReconciliationCSV } from '@/lib/exportCSV';
+import { generatePDF } from '@/lib/exportPDF';
 export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
   const [metrics, setMetrics] = useState(null);
   const [exceptions, setExceptions] = useState([]);
@@ -191,7 +193,10 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
   <div className="header-actions">
     <ReconcileButton onComplete={handleReconcile} alreadyReconciled={metrics.total > 0} />
     <button className="btn-download" onClick={() => downloadReconciliationCSV(exceptions, metrics)}>
-      ⬇ Download Report
+      ⬇ CSV
+    </button>
+    <button className="btn-download btn-pdf" onClick={() => generatePDF(exceptions, metrics, auditLogs)}>
+      📄 PDF Report
     </button>
   </div>
 </div>
@@ -202,6 +207,8 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
 
       <MatchRateCard matchRate={metrics.matchRate} totalRecords={metrics.total} matchedCount={metrics.matched} />
       <StatsCards stats={metrics} />
+
+      <ChartsPanel exceptions={exceptions} metrics={metrics} />
 
       <div className="dash-grid">
         <div className="dash-left">
@@ -233,6 +240,15 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
 .btn-download:hover {
   background: var(--border-card);
   border-color: #0070f3;
+}
+.btn-pdf {
+  background: rgba(255,107,107,0.08);
+  border-color: rgba(255,107,107,0.2);
+  color: #ff6b6b;
+}
+.btn-pdf:hover {
+  background: rgba(255,107,107,0.15);
+  border-color: #ff6b6b;
 }
         .dash-header {
           display: flex;

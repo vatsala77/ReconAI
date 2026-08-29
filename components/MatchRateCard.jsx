@@ -5,7 +5,6 @@ export default function MatchRateCard({ matchRate, totalRecords, matchedCount })
 
   return (
     <div className="card">
-      <p className="card-label">Reconciliation Match Rate</p>
       <div className="row">
         <span className="rate" style={{ color }}>{rate.toFixed(1)}%</span>
         <span className="sub">{matchedCount} / {totalRecords} settled</span>

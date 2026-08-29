@@ -90,6 +90,7 @@ export default function ConnectRazorpayModal({ onClose, onConnected, onUseDemoSa
         <button className="btn-demo" onClick={handleDemoClick} disabled={loading || demoLoading}>
           {demoLoading ? 'Syncing demo data…' : "🧪 Don't have test credentials? Use our demo sandbox"}
         </button>
+        <p className="demo-note">Uses developer's test Razorpay account — sample Route transfer data, no real money or live keys involved.</p>
 
         <p className="modal-note">
           🔒 Test-mode credentials only (must start with <code>rzp_test_</code>) — used solely to fetch Route transfer data for reconciliation. No live/production keys accepted.
@@ -160,6 +161,14 @@ export default function ConnectRazorpayModal({ onClose, onConnected, onUseDemoSa
           border-color: rgba(0,112,243,0.4);
         }
         .btn-demo:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .demo-note {
+          color: #7c8493;
+          font-size: 11px;
+          margin-top: 8px;
+          text-align: center;
+          line-height: 1.4;
+        }
 
         .modal-note { color: #7c8493; font-size: 12px; margin-top: 18px; line-height: 1.5; }
         .modal-note code { background: var(--bg-card-elevated); padding: 1px 5px; border-radius: 4px; }

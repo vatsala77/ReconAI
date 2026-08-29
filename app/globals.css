@@ -388,3 +388,39 @@ body {
 }
 .how-card h3 { font-size: 20px; margin: 0 0 12px 0; color: var(--text-primary); }
 .how-card p { color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin: 0; }
+
+/* ============================================
+   LIGHT MODE — Homepage-style blue cards
+   ============================================ */
+html[data-theme='light'] .card,
+html[data-theme='light'] .stat-card,
+html[data-theme='light'] .panel,
+html[data-theme='light'] .chart-card,
+html[data-theme='light'] .upload-item,
+html[data-theme='light'] .uploads-card,
+html[data-theme='light'] .empty-state-card,
+html[data-theme='light'] .suggestion-box,
+html[data-theme='light'] .resolved-trail,
+html[data-theme='light'] .demo-file-banner,
+html[data-theme='light'] .preview-panel,
+html[data-theme='light'] .profile-dropdown,
+html[data-theme='light'] .connection-badge,
+html[data-theme='light'] [style*="background: var(--bg-card)"],
+html[data-theme='light'] [class*="card"] {
+  background: #f0f9ff !important;
+  border: 1px solid #7dd3fc !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08) !important;
+}
+html[data-theme='light'] .how-panel,
+html[data-theme='light'] .diff-panel {
+  background: #f0f9ff !important;
+  border: 1px solid #7dd3fc !important;
+}
+html[data-theme='light'] .how-card:hover,
+html[data-theme='light'] .diff-card:hover,
+html[data-theme='light'] .upload-item:hover {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.16) !important;
+}

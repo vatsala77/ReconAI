@@ -1,156 +1,167 @@
-<div align="center">
-
 # 🚀 ReconAI
 
-### Route splits your payments. AI explains where they went. 💡
+> **Route splits your payments. AI explains where they went. 💡**
 
-Built with ❤️ for the **Razorpay AI Buildathon 2026** — *Track 04: AI Finance Controller* 🏆
-
-</div>
+Built with ❤️ for **Razorpay AI Buildathon 2026** — *Track 04: AI Finance Controller* 🏆
 
 ---
 
 ## 🚨 The Problem
 
-Every marketplace running on Razorpay Route faces the same monthly nightmare: a customer pays, Route splits it across vendors, deducts TDS, holds a chargeback amount, takes a platform fee — and by month-end, finance teams are still manually tracing rupees across Excel sheets, bank statements, and settlement APIs.
+Every marketplace running on **Razorpay Route** faces the same monthly nightmare: a customer pays ₹10,000, Route splits it across Vendor A, Vendor B, deducts TDS, holds a chargeback amount, and takes a platform fee. At month-end, finance teams manually download settlement reports, bank statements, and GST filings separately, then spend **3–5 days** in Excel trying to answer one question:
 
-> ❓ *"Where did every rupee go?"*
+> ❓ *"Where did every rupee go — and did we deduct tax correctly on every single one?"*
 
 ### ❌ Why Existing Tools Fall Short
 
-- 📕 **Razorpay Recon** — confirms Razorpay settled correctly to the merchant, but has no visibility into how that merchant then split funds across multiple vendors internally.
-- 🧾 **ERP tools** — built for month-end, balance-sheet-focused accounting, not for tracing a single transaction's multi-party Route split.
-- 📊 **Spreadsheets** — fast to start, slow to trust, and impossible to audit across 50+ orders and multiple data sources.
+* 📉 **Razorpay Recon:** Confirms Razorpay settled correctly to the merchant — but has no visibility into how that merchant then split funds across multiple vendors internally, whether the bank actually credited what Route transferred, or whether TDS was deducted at the right rate.
+* 🏢 **Enterprise ERP tools (Bluecopa, Osfin):** Month-end, balance-sheet focused — not built to trace a single transaction's multi-party Route split, or verify tax-line-level compliance.
+* 📊 **Excel + VLOOKUP:** Manual, error-prone, checks totals but rarely individual tax lines — and leaves no audit trail.
 
-> 💡 **The difference:** Razorpay Recon confirms your platform *got paid* correctly. ReconAI confirms your platform *paid its vendors* correctly. Different layer, same trust chain! 🤝
+> 💡 **The Difference:** Razorpay Recon confirms your platform got paid correctly. **ReconAI** confirms your platform paid its vendors correctly — down to the individual tax line. *Different layer, same trust chain!* 🤝
 
 ---
 
 ## ✨ The Solution
 
-ReconAI is a **Route-native reconciliation engine with AI on top of it** — an AI reconciliation layer sitting between the merchant and the Route payout chain.
+ReconAI is an AI reconciliation agent purpose-built for Razorpay Route marketplaces:
 
-### 🧩 Core Capabilities
-
-| # | Capability | What it does |
-|:-:|:---|:---|
-| 1️⃣ | **Multi-source reconciliation** | Matches orders ↔ Route transfers ↔ bank credits ↔ GST/TCS filings, catching discrepancies across the *full* settlement chain |
-| 2️⃣ | **AI-assisted upload & mapping** | Accepts messy Excel files with arbitrary headers, auto-maps columns, supports multi-sheet uploads |
-| 3️⃣ | **Tax-line verification** | Validates TDS under Section 194-O, checks GST on fee/tax lines, flags tax mismatches separately from amount mismatches |
-| 4️⃣ | **Exception taxonomy** | 10 real categories — from `missing_payout` to `gst_tcs_mismatch` (full list below 👇) |
-| 5️⃣ | **AI explanation layer** | Lightweight RAG retrieves policy text, explains each exception in plain English, with confidence scores 🎯 |
-| 6️⃣ | **Explainable action agent** | Suggests one concrete fix per exception, keeps human-in-the-loop, logs everything for audit ✅ |
-| 7️⃣ | **Settlement Q&A agent** | Ask natural-language questions over the batch — order, category, summary, high-risk queries 💬 |
-| 8️⃣ | **Live Razorpay sync** | Connects to a Razorpay account in test/demo mode and pulls transfer data directly 🔄 |
-| 9️⃣ | **Batch health summary** | One glance snapshot — amount at risk, dominant exception types 📈 |
-
-### 🏷️ Exception Categories
-
-```
-missing_payout        duplicate_payout       amount_mismatch
-chargeback_hold        reversal_pending       settlement_failed
-bank_credit_delayed    bank_amount_mismatch   gst_tcs_mismatch
-tax_line_discrepancy
-```
+1. 📂 **Upload or Sync** — Upload your settlement Excel in any column format (AI maps it automatically), sync live from your own connected Razorpay test-mode account, or load the built-in demo dataset instantly.
+2. 🤖 **AI-Powered Column Mapping** — Automatically detects and maps fields regardless of naming — no manual template conversion required.
+3. ⚙️ **Multi-Source Matching Engine** — Reconciles every order against Route transfers, bank settlement UTRs, and GST filings — three independent data sources, not a single ledger check.
+4. 🧾 **Tax-Line Verification** — TDS (Section 194-O: 0.1% standard, 5% penal rate without PAN, ₹5 lakh threshold exemption for individuals/HUFs) and GST-on-fee (18%) are checked individually against exact regulatory formulas, not estimated.
+5. 🔍 **Automatic Discrepancy Categorization** — Missing payouts, duplicate transfers, expired holds, reversals, failed settlements, amount mismatches, bank credit delays, bank amount mismatches, GST TCS mismatches, and tax-line discrepancies.
+6. 📚 **RAG-Grounded AI Explainer** — Generates a plain-English explanation for every exception, citing the exact regulation that applies.
+7. 💬 **Settlement Q&A Agent** — Natural-language chat over batch data, intelligently routed to the right data-fetching strategy (specific order, category breakdown, top-risk ranking, or batch summary) before answering.
+8. ✅ **Explainable Action Agent** — AI suggests a resolution for each exception; a human explicitly resolves, escalates, or ignores it. Nothing auto-executes — every decision is bounded, gated, and logged to an audit trail.
+9. 📊 **Honest, Visualized Exception List** — Every run reports a measured match rate, an open/resolved breakdown, and interactive charts — nothing hidden to make the demo look cleaner.
 
 ---
 
-## ⚖️ ReconAI vs Razorpay Recon
+## ⚡ Why ReconAI + Razorpay = Perfect Match?
 
-| Capability | 📕 Razorpay Recon | 🚀 ReconAI |
+| Feature 📌 | Razorpay Recon 💳 | ReconAI 🤖 |
 | :--- | :--- | :--- |
-| **Core question** | Did Razorpay settle correctly to me? | Did I correctly split & reconcile that money onward to vendors and taxes? |
-| **Scope** | Merchant → Razorpay | Merchant → Route split chain → bank → GST |
-| **Data sources** | Settlement ledger | Orders, transfers, bank settlements, GST filings |
-| **Best fit** | Ledger validation | Marketplace financial reconciliation |
-| **Exception depth** | Settlement-level | Transaction, tax, hold, reversal & payout level |
+| **Scope** | Razorpay ↔ Merchant (single ledger) | Merchant ↔ Multiple Vendors (Route splits) |
+| **Question answered** | "Did Razorpay settle what it owed me?" | "Did I correctly pass that money to my vendors — and deduct tax correctly?" |
+| **Tax-line depth** | Not covered | TDS (194-O) and GST-on-fee verified per transaction |
+| **Best for** | Any Razorpay merchant | Marketplaces/platforms using Route |
+| **Relationship** | Foundation layer | Builds on top of Recon's data |
+
+🎯 **Example:** A customer pays ₹500 for a food delivery order.
+* *Razorpay Recon* confirms Razorpay settled that ₹500 to the platform correctly.
+* But that ₹500 needs to become **₹350** (Restaurant) + **₹75** (Delivery Partner) + **₹50** (Platform Fee) + **₹25** (TDS).
+* Did that split happen correctly, was the bank credit confirmed, was TDS at the right rate, and was GST filed correctly — for all 1,000 orders today? **ReconAI tells you instantly, and explains every exception in plain English.** ⚡
 
 ---
 
-## 💸 Example Walkthrough
+## 🎯 Track Alignment — "AI Finance Controller"
 
-A customer pays **₹500** for an order.
+> 🎯 **The bar:** Throughput plus measured accuracy plus an honest exception list. One cherry-picked match proves nothing.
 
-Razorpay Recon confirms ₹500 was received by the platform. ✅ Done, for them.
+ReconAI is built directly against this bar:
 
-But the real operational flow looks like this:
-
-```
-₹350 → Vendor
-₹75  → Delivery partner
-₹50  → Platform fee
-₹25  → TDS / tax deduction
-  ⚠️  possible chargeback hold or reversal
-```
-
-**ReconAI** checks whether that split actually happened, whether the bank credit matched, whether the Route transfer was delayed or failed, and whether the tax-line math is correct. 🔍
+* 🚀 **Throughput:** Processes full batches (50+ records across Orders, Transfers, Bank Settlements, and GST Filings), not isolated demo cases.
+* 🎯 **Measured accuracy:** Every run reports a match rate percentage and a per-exception AI confidence score.
+* 🔎 **Honest exception list:** Every unresolved case is shown, categorized, and explained — including cases where AI confidence is low. Nothing is hidden to make the demo look cleaner. The built-in demo dataset intentionally includes ~35% exceptions across every category the engine detects, rather than a cherry-picked clean run.
 
 ---
 
-## 🛠️ How the System Works
+## 🔥 Core Features
 
-```
-📤  Excel upload / Razorpay sync
-          │
-          ▼
-🧠  AI field mapping + normalization
-          │
-          ▼
-📦  Orders + Route transfers + bank settlements + GST filings
-          │
-          ▼
-🔀  Multi-source reconciliation engine
-          │
-          ├── ✅ matched cleanly
-          │
-          └── ⚠️  exception detected
-                    │
-                    ▼
-          📚  Tax-line validation + RAG rule retrieval
-                    │
-                    ▼
-          🤖  AI explanation + confidence scoring
-                    │
-                    ▼
-     🛠️  Action suggestions + audit log + dashboard summary
-```
+### 🔗 Multi-Source Reconciliation
+Orders, Route Transfers, Bank UTRs, and GST Filings — cross-verified against each other, not checked in isolation.
+
+### 🧾 Tax-Line Verification
+TDS and GST-on-fee checked individually against exact regulatory formulas — including the ₹5 lakh threshold exemption for individual/HUF sellers, tracked against real cumulative financial-year volume (not assumed).
+
+### 💬 Settlement Q&A Agent
+Query-routed AI chat — classifies each question (specific order / category breakdown / top-risk / summary / general) and fetches only the relevant data before answering, instead of dumping the entire batch into every prompt. Chat history persists per batch.
+
+### ✅ Explainable Action Agent
+Every exception gets an AI-suggested resolution with reasoning. A human explicitly **Resolves**, **Escalates**, or **Ignores** it — nothing is auto-executed. Every action is written to a permanent audit trail (who, what, when, why).
+
+### ⚡ Live Razorpay Sync
+Connect your own Razorpay test-mode account (credentials encrypted at rest, only `rzp_test_` keys accepted), or try the one-click **Demo Sandbox** using a pre-built 52-record dataset covering every exception category the engine can detect.
+
+### 📊 Interactive Dashboard
+- Pie chart — exception categories breakdown
+- Bar chart — seller-wise exception distribution
+- Donut chart — match rate with open/resolved/total stats
+- Status filter pills (All / Open / Resolved) with live counts
+- Bulk selection — resolve, escalate, or ignore multiple exceptions at once
+- Real-time reconciliation progress indicator ("Processing order X of Y…")
+- AI-generated batch health summary (plain-English one-glance status)
+
+### 📄 Compliance-Ready Export
+One-click PDF report — branded header, summary stats, exception category breakdown, full exception details with AI explanations, and the complete audit trail. CSV export also available for raw data handoff.
+
+### 🎨 Light & Dark Mode
+Full theme support across the entire app, including the landing page, dashboard, and all cards.
+
+### 🏢 Multi-Tenant Architecture
+Company-level authentication (NextAuth, bcrypt-hashed credentials) with isolated upload history per account.
 
 ---
 
-## 🧰 Tech Stack
+## 🛠️ Tech Stack
 
-| Layer | Stack |
+| Layer | Technology |
 | :--- | :--- |
-| 🖼️ Framework | Next.js 16 (App Router) |
-| ⚛️ Frontend | React 19 + component-based UI |
-| ⚙️ Backend | Next.js server routes |
-| 🗄️ Database | PostgreSQL + Prisma ORM |
-| 🔐 Auth | NextAuth.js with credentials + bcrypt |
-| 🧠 AI reasoning | OpenRouter with GPT OSS models |
-| 🔎 Embeddings | HuggingFace sentence-transformers via Inference API |
-| 📚 RAG | Custom lightweight JSON vector store + cosine similarity |
-| 📄 File parsing | xlsx (SheetJS) |
-| 💳 Payments | Razorpay Node SDK |
-| ☁️ Deployment | Vercel-ready |
+| **Framework** | Next.js 15 (App Router) |
+| **Database** | Neon (Serverless Postgres) + Prisma ORM |
+| **Auth** | NextAuth.js (Credentials provider, bcrypt-hashed passwords) |
+| **AI — Reasoning** | OpenRouter (`openai/gpt-oss-120b`) — column mapping, exception explanations, chat, resolution suggestions |
+| **AI — Embeddings** | HuggingFace Inference API (`sentence-transformers/all-MiniLM-L6-v2`) |
+| **RAG** | Custom lightweight JSON-based vector store with cosine similarity, grounded on TDS/GST/bank-settlement regulatory text |
+| **Payments Integration** | Razorpay Node SDK — live Route transfer/payment sync (test mode only) |
+| **File Parsing** | `xlsx` (SheetJS) with AI-powered column mapping |
+| **Charts** | Recharts — pie, bar, and donut visualizations |
+| **PDF Generation** | jsPDF — compliance report export |
+| **Styling** | Plain CSS / styled-jsx, with light/dark theme support |
+| **Deployment** | Vercel |
 
 ---
 
-## ✅ Features Implemented in This Repo
+## 🏗️ System Architecture
 
-- 🧠 AI-powered Excel column mapping for messy upload files
-- 🏢 Multi-tenant company auth and isolated upload history
-- 🔗 Route transfer matching based on real order/transfer structures
-- 🚫 Duplicate payout and missing payout detection
-- ⏸️ Chargeback hold and expired hold monitoring
-- ↩️ Reversal and settlement failure handling
-- 🏦 Bank settlement verification using UTR/credit checks
-- 🧾 GST TCS validation and tax discrepancy workflows
-- 🏷️ Route-native exception taxonomy
-- 📚 RAG-grounded explanations from regulation text files
-- 💬 Natural-language chat over batch data
-- ✅ Explainable resolution suggestions with human approval flow
-- 📊 Batch health summary card
-- 🖥️ Dashboard review surfaces for reconciliation and exceptions
+```text
+Company uploads Excel (Orders + Transfers + optional Bank/GST sheets)
+        OR syncs live from Razorpay (own account or demo sandbox)
+                          │
+                          ▼
+        🤖 AI Column-Mapping Engine (OpenRouter, any header format)
+                          │
+                          ▼
+              💾 Bulk insert into Neon (Prisma)
+                          │
+                          ▼
+      ⚙️ Reconciliation Engine — 4 layers, in order:
+      │  1. Route-level match (Orders ↔ Transfers)
+      │  2. Bank Settlement check (UTR, amount, delay)
+      │  3. GST Filing check (TCS on net taxable value)
+      │  4. Tax-Line check (TDS rate/threshold, GST-on-fee)
+      │
+  ✅ Matched                                        🚨 Exception detected
+                                                           │
+                                                           ▼
+                                       📚 RAG retrieval (TDS / GST / bank-settlement rules)
+                                                           │
+                                                           ▼
+                            🧠 OpenRouter generates plain-English explanation + confidence score
+                                                           │
+                                                           ▼
+                             💾 Stored in Neon (Reconciliation + Exception + AuditLog)
+                                                           │
+                                                           ▼
+              📊 Dashboard — match rate, charts, exception list, AI health summary
+                                                           │
+                        ┌──────────────────────┬──────────────────────┐
+                        ▼                      ▼                      ▼
+              💬 Settlement Q&A Agent   ✅ Explainable Action Agent   📄 PDF/CSV Export
+              (query-routed chat)       (suggest → human resolves,
+                                          escalates, or ignores)
+```
 
 ---
 
@@ -262,106 +273,80 @@ reconai/
 
 ---
 
-## 🚦 Getting Started
+## 🚀 Getting Started
 
-### 1️⃣ Clone the repo
+### 1️⃣ Clone & Install
 
 ```bash
-git clone <repo-url>
-cd reconai
+git clone https://github.com/vatsala77/ReconAI.git
+cd ReconAI
 npm install
 ```
 
-### 2️⃣ Configure environment variables
+### 2️⃣ Environment Variables
 
-Create a `.env.local` file:
+Create `.env.local`:
 
-```bash
-DATABASE_URL=postgresql://...your-db-url...
-AUTH_SECRET=your-32-char-secret
+```env
+DATABASE_URL=your_neon_postgres_connection_string
+AUTH_SECRET=your_random_32_char_secret
 NEXTAUTH_URL=http://localhost:3000
 
-OPENROUTER_API_KEY=your_openrouter_key
-HUGGINGFACE_API_KEY=your_huggingface_key
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-ENCRYPTION_SECRET=your_encryption_secret
+OPENROUTER_API_KEY=your_openrouter_api_key
+HUGGINGFACE_API_KEY=your_huggingface_api_key
+
+RAZORPAY_KEY_ID=your_razorpay_test_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_test_key_secret
+ENCRYPTION_SECRET=your_random_32_char_secret_for_credential_encryption
 ```
 
-### 3️⃣ Set up Prisma
+### 3️⃣ Database Setup
 
 ```bash
-npx prisma generate
 npx prisma migrate dev
+npx prisma generate
 ```
 
-Optional demo dataset:
-
-```bash
-node scripts/seedData.js
-```
-
-### 4️⃣ Run the app
+### 4️⃣ Run Development Server
 
 ```bash
 npm run dev
 ```
 
-Then open 👉 `http://localhost:3000`
+Visit `http://localhost:3000` — sign up, then either:
+- Click **"Try Demo Sandbox"** to instantly load a full 52-record reconciliation batch, or
+- Upload your own settlement Excel, or
+- Connect your own Razorpay test-mode account and sync live.
 
 ---
 
-## 📖 How to Use It
+## 📋 Excel Upload Format
 
-1. 🔑 Sign up or log in to a company account.
-2. 📤 Upload a settlement Excel file or connect Razorpay in demo/test mode.
-3. 🧠 Let the app map the uploaded data and reconcile orders against Route transfers.
-4. 🔍 Review exceptions, tax mismatches, and bank/settlement anomalies.
-5. 💬 Ask the batch Q&A agent questions in natural language.
-6. ✅ Review AI-suggested actions and resolve exceptions with audit tracking.
+ReconAI accepts a multi-sheet Excel file:
 
----
+| Sheet 📑 | Required ⚠️ | Key Fields 🔑 |
+| :--- | :--- | :--- |
+| Orders | Yes | `order_id`, `amount`, `platform_fee`, `tds`, `refund`, `customer_id`, `seller_id`, `seller_type`, `pan_available` |
+| Transfers | Yes | `transfer_id`, `source`, `recipient`, `amount`, `on_hold`, `on_hold_until`, `amount_reversed`, `settlement_status`, `fee`, `tax`, `error_description` |
+| Bank Settlements | Optional | `utr`, `transfer_id`, `amount_credited`, `credited_at`, `status` |
+| GST Filings | Optional | `vendor_gstin`, `order_id`, `tcs_reported`, `filing_period`, `status` |
 
-## 🧮 Reconciliation Logic
+Column names don't need to match exactly — the AI mapping engine detects the correct field even if your spreadsheet uses different naming conventions. `seller_type` and `pan_available` power the Section 194-O tax-line checks (threshold exemption and penal-rate detection); if omitted, the engine defaults to standard-rate assumptions.
 
-ReconAI is built around three core ideas:
-
-- 🧾 **Order-level truth** — what the merchant sold and what the customer paid
-- 🔀 **Transfer-level truth** — what Route actually transferred or held
-- 🏦 **Settlement-level truth** — what reached the bank and what GST filings included
-
-The reconciliation engine does not stop at a single match — it validates each order across multiple layers and only marks it clean when **all** relevant checks pass. ✅
+A ready-to-use demo file with all exception categories is available at `data/reconai_full_demo_batch_50plus.xlsx`, or accessible directly from the dashboard's demo banner.
 
 ---
 
-## 🛡️ Compliance & AI Caution
+## 🔮 Future Roadmap
 
-> This project is designed to support finance operations workflows, **not** to auto-execute money movement. The AI layer explains, routes, and recommends — the human stays the final decision-maker. 🧑‍⚖️
-
-That's intentional:
-
-- 🎯 the app surfaces confidence scores
-- 🏷️ it reports exception categories honestly
-- 👀 it encourages review before resolution
-
----
-
-## 🗺️ Roadmap
-
-- 🌐 Broader gateway abstraction beyond Razorpay Route
-- 🤖 More advanced exception auto-resolution flows
-- 🕰️ Richer audit trails and historical reconciliation snapshots
-- ⚡ Better incremental reconciliation for large batches
-- 📊 More dashboard drilldowns and finance exports
+- 🌐 **Gateway-agnostic reconciliation** — The matching engine is architected independently of Route's specific field names; future versions could extend to Stripe Connect, PayPal Marketplace, or other split-payment gateways.
+- 🔌 **MCP server exposure** — Allowing external AI agents (Claude, Cursor) to query reconciliation state directly via the Model Context Protocol.
+- 📈 **Forward cash forecasting** — ML-based prediction of on-hold transfer settlement delays, feeding an AI-narrated cash-flow projection.
+- 🚨 **Cross-batch risk signals** — Flagging sellers with abnormally high exception rates across multiple batches.
+- 📈 **Incremental reconciliation** — Processing only new/unmatched records on re-run, preserving historical audit trails at scale.
 
 ---
 
 ## 👥 Team
 
-Built for the **Razorpay AI Buildathon 2026** as a focused AI Finance Controller prototype for Route marketplaces. 🏆
-
----
-
-## 📄 License
-
-This project is for demo and prototype use as part of the Razorpay AI Buildathon 2026. Contact the repository owner for commercial usage details.
+Built solo for the Razorpay AI Buildathon 2026.

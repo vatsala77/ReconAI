@@ -163,6 +163,9 @@ model Exception {
   taxLineBreakdown Json? @map("tax_line_breakdown")
 
   status            String   @default("open")
+  resolution        String?  // resolved, escalated, ignored
+  resolvedBy        String?  @map("resolved_by")
+  resolutionNote    String?  @map("resolution_note")
   createdAt         DateTime @default(now()) @map("created_at")
   resolvedAt        DateTime? @map("resolved_at")
   
