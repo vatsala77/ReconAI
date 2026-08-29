@@ -1,9 +1,12 @@
 import { prisma } from '@/lib/prisma';
-import Groq from 'groq-sdk';
+import OpenAI from 'openai';
 import { ragStore } from '@/lib/rag';
 import { classifyQuestion } from '@/lib/chatRouter';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const openrouter = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1',
+});
 
 export async function POST(request) {
   try {
@@ -92,7 +95,7 @@ Instructions:
 - If the question is about this batch (orders, exceptions, amounts, reconciliation, tax rules), answer strictly from the data/regulation above. Be concise (2-3 sentences), cite order IDs/amounts where relevant.
 - If the question is general/unrelated to the batch (e.g. basic math, greetings, general knowledge), just answer it directly and naturally — don't force it into the batch context.`;
 
-    const completion = await groq.chat.completions.create({
+    const completion = await openrouter.chat.completions.create({
       model: 'openai/gpt-oss-120b',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,

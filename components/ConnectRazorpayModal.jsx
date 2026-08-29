@@ -103,7 +103,7 @@ export default function ConnectRazorpayModal({ onClose, onConnected, onUseDemoSa
           padding: 20px;
         }
         .modal-box {
-          background: #101b33; border: 1px solid #1f2942; border-radius: 16px;
+          background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 16px;
           padding: 32px; max-width: 440px; width: 100%;
         }
         h2 { color: #fff; font-size: 18px; margin-bottom: 8px; }
@@ -123,7 +123,7 @@ export default function ConnectRazorpayModal({ onClose, onConnected, onUseDemoSa
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-ghost {
           padding: 10px 20px; border-radius: 8px; background: transparent;
-          border: 1px solid #2a344e; color: #c1c6d7; cursor: pointer;
+          border: 1px solid var(--border-card); color: var(--text-secondary); cursor: pointer;
         }
 
         .demo-divider {
@@ -139,7 +139,7 @@ export default function ConnectRazorpayModal({ onClose, onConnected, onUseDemoSa
         .demo-divider::before, .demo-divider::after {
           content: '';
           flex: 1;
-          border-bottom: 1px solid #1f2942;
+          border-bottom: 1px solid var(--border-card);
         }
         .demo-divider span { padding: 0 12px; }
 
@@ -162,7 +162,7 @@ export default function ConnectRazorpayModal({ onClose, onConnected, onUseDemoSa
         .btn-demo:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .modal-note { color: #7c8493; font-size: 12px; margin-top: 18px; line-height: 1.5; }
-        .modal-note code { background: #1f2942; padding: 1px 5px; border-radius: 4px; }
+        .modal-note code { background: var(--bg-card-elevated); padding: 1px 5px; border-radius: 4px; }
       `}</style>
     </div>
   );

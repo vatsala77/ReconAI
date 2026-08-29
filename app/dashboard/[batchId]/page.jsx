@@ -3,6 +3,7 @@ import { use, useState, useEffect } from 'react';
 import Dashboard from '@/components/Dashboard';
 import DashboardHeader from '@/components/DashboardHeader';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 export default function BatchDashboard({ params }) {
   const { batchId } = use(params);
@@ -21,64 +22,45 @@ export default function BatchDashboard({ params }) {
 
       <main className="dash-page">
         <div className="dash-container">
-                    <Link href="/dashboard" 
-            className="back-btn"
-          >
+          <Link href="/dashboard" className="back-btn">
+            <ArrowLeft size={16} />
             Back to uploads
           </Link>
           <Dashboard uploadBatchId={batchId} autoRun={true} />
         </div>
       </main>
       
-      <style jsx>{`
-        :global(body) {
-          background-color: #07122a;
-          color: #ffffff;
-          background-image:
-            linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 50px 50px;
-          font-family: 'Segoe UI', -apple-system, sans-serif;
+      <style jsx global>{`
+        .dash-page {
+          padding: 32px 24px 64px;
+          min-height: 100vh;
         }
-        .navbar {
-          position: sticky; top: 0; z-index: 50;
-          background: rgba(7,18,42,0.9);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid #151f37;
+
+        .dash-container {
+          max-width: 1400px;
+          margin: 0 auto;
         }
-        .navbar-inner { display: flex; align-items: center; padding: 16px 24px; max-width: 1400px; margin: 0 auto; }
-        .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
-        .brand-icon { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, #0070f3, #0059c5); }
-        .brand-name { font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
 
-        .dash-page { padding: 32px 24px 64px; }
-        .dash-container { max-width: 1400px; margin: 0 auto; }
-
-        /* :global pseudo-class Next.js Link elements me style pass karne me help karta hai */
-        :global(.back-btn) {
+        .back-btn {
           display: inline-flex;
           align-items: center;
-          padding: 10px 16px;
-          border-radius: 10px;
-          background: #101c38;
-          border: 1px solid #253154;
-          color: #e2e8f0;
+          gap: 8px;
+          padding: 8px 16px;
+          border-radius: 8px;
           font-size: 14px;
-          font-weight: 600;
+          font-weight: 500;
           text-decoration: none;
-          margin-bottom: 24px;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-          transition: all 0.15s ease;
+          color: var(--text-primary);
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+          transition: all 0.2s ease;
+          margin-bottom: 20px;
         }
-        :global(.back-btn:hover) {
-          background: #16234a;
-          border-color: #0070f3;
-          color: #ffffff;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0,112,243,0.15);
-        }
-        :global(.back-btn:active) {
-          transform: translateY(0);
+        .back-btn:hover {
+          background: var(--bg-card-elevated);
+          border-color: var(--accent);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
       `}</style>
     </>

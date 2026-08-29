@@ -2,8 +2,9 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request, { params }) {
   try {
+    const { batchId } = await params;
     const batch = await prisma.uploadBatch.findUnique({
-      where: { id: params.batchId },
+      where: { id: batchId },
       select: { companyId: true },
     });
 

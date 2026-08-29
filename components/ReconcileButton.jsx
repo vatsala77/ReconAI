@@ -19,9 +19,13 @@ export default function ReconcileButton({ onComplete, alreadyReconciled }) {
         }
         .btn-primary { background: #0070f3; color: white; box-shadow: 0 4px 14px rgba(0,112,243,0.2); }
         .btn-primary:hover { background: #0059c5; }
-        .btn-secondary { background: #1f2942; color: #ffffff; border: 1px solid #2a344e; }
-        .btn-secondary:hover { background: #2a344e; }
+        .btn-secondary { background: var(--bg-card-elevated); color: var(--text-primary); border: 1px solid var(--border-card); }
+        .btn-secondary:hover { background: var(--border-card); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ===== LIGHT MODE ===== */
+        :global(html[data-theme="light"]) .btn-secondary { background: #f1f5f9; color: #0f172a; border-color: #e2e8f0; }
+        :global(html[data-theme="light"]) .btn-secondary:hover { background: #e2e8f0; }
       `}</style>
     </button>
   );

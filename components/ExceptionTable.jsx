@@ -151,15 +151,15 @@ export default function ExceptionTable({ exceptions: initialExceptions }) {
       })}
 
       <style jsx>{`
-        .panel { background: #101b33; border: 1px solid #1f2942; border-radius: 16px; overflow: hidden; }
-        .panel-title { font-size: 14px; font-weight: 600; color: #ffffff; padding: 16px 20px; margin: 0; border-bottom: 1px solid #1f2942; }
+        .panel { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 16px; overflow: hidden; }
+        .panel-title { font-size: 14px; font-weight: 600; color: var(--text-primary); padding: 16px 20px; margin: 0; border-bottom: 1px solid var(--border-card); }
         .empty { padding: 20px; color: #7c8493; font-size: 13px; margin: 0; }
         .row {
           width: 100%; display: flex; justify-content: space-between; align-items: center;
-          padding: 14px 20px; background: none; border: none; border-bottom: 1px solid #1f2942;
+          padding: 14px 20px; background: none; border: none; border-bottom: 1px solid var(--border-card);
           cursor: pointer; text-align: left; color: inherit;
         }
-        .row:hover { background: #151f37; }
+        .row:hover { background: var(--bg-card-elevated); }
         .left { display: flex; align-items: center; gap: 12px; }
         .badge { font-size: 11px; font-family: 'Courier New', monospace; padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
         .order-id { font-size: 13px; font-family: 'Courier New', monospace; color: #e4e7ec; }
@@ -189,11 +189,11 @@ export default function ExceptionTable({ exceptions: initialExceptions }) {
           font-size: 10px;
         }
 
-        .action-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid #1f2942; }
+        .action-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-card); }
 
         .suggest-btn {
-          background: #1f2942;
-          border: 1px solid #2a344e;
+          background: var(--bg-card-elevated);
+          border: 1px solid var(--border-card);
           color: #aec6ff;
           font-size: 13px;
           font-weight: 600;
@@ -202,7 +202,7 @@ export default function ExceptionTable({ exceptions: initialExceptions }) {
           cursor: pointer;
           transition: all 0.2s;
         }
-        .suggest-btn:hover:not(:disabled) { background: #2a344e; border-color: #0070f3; }
+        .suggest-btn:hover:not(:disabled) { background: var(--border-card); border-color: #0070f3; }
         .suggest-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .suggestion-box {
@@ -241,6 +241,33 @@ export default function ExceptionTable({ exceptions: initialExceptions }) {
         .resolved-line { font-size: 12.5px; color: #34D399; margin: 0 0 4px 0; }
         .resolved-line strong { color: #ffffff; }
         .resolved-action { font-size: 12.5px; color: #c1c6d7; margin: 0; }
+        .resolved-line strong { color: #ffffff; }
+
+        /* ===== LIGHT MODE ===== */
+        :global(html[data-theme="light"]) .panel { background: #ffffff; border-color: #e2e8f0; }
+        :global(html[data-theme="light"]) .panel-title { color: #0f172a; border-bottom-color: #e2e8f0; }
+        :global(html[data-theme="light"]) .empty { color: #64748b; }
+        :global(html[data-theme="light"]) .row:hover { background: #f8fafc; }
+        :global(html[data-theme="light"]) .row { border-bottom-color: #e2e8f0; }
+        :global(html[data-theme="light"]) .order-id { color: #0f172a; }
+        :global(html[data-theme="light"]) .confidence-text { color: #64748b; }
+        :global(html[data-theme="light"]) .detail { color: #475569; }
+        :global(html[data-theme="light"]) .suggest-btn { background: #f1f5f9; border-color: #e2e8f0; color: #0070f3; }
+        :global(html[data-theme="light"]) .suggest-btn:hover { background: #e2e8f0; border-color: #0070f3; }
+        :global(html[data-theme="light"]) .reasoning { color: #475569; background: #f8fafc; border-color: #e2e8f0; }
+        :global(html[data-theme="light"]) .suggestion-box { background: #f0f9ff; border-color: #bae6fd; }
+        :global(html[data-theme="light"]) .suggestion-label { color: #64748b; }
+        :global(html[data-theme="light"]) .suggestion-action { color: #0f172a; }
+        :global(html[data-theme="light"]) .suggestion-reasoning { color: #475569; }
+        :global(html[data-theme="light"]) .approve-btn { color: #ffffff; }
+        :global(html[data-theme="light"]) .tax-table th, :global(html[data-theme="light"]) .tax-table td { border-bottom-color: #e2e8f0; color: #475569; }
+        :global(html[data-theme="light"]) .tax-table th { color: #64748b; }
+        :global(html[data-theme="light"]) .amt { color: #64748b; }
+        :global(html[data-theme="light"]) .conf { color: #64748b; }
+        :global(html[data-theme="light"]) .resolved-trail { background: rgba(52,211,153,0.06); border-color: rgba(52,211,153,0.2); }
+        :global(html[data-theme="light"]) .resolved-line { color: #16a34a; }
+        :global(html[data-theme="light"]) .resolved-line strong { color: #0f172a; }
+        :global(html[data-theme="light"]) .resolved-action { color: #475569; }
       `}</style>
     </div>
   );

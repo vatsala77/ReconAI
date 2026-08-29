@@ -165,8 +165,8 @@ export default function ChatPanel({ uploadBatchId }) {
 
       <style jsx>{`
         .chat-panel {
-          background: #101b33;
-          border: 1px solid #1f2942;
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
           border-radius: 20px;
           display: flex;
           flex-direction: column;
@@ -178,7 +178,7 @@ export default function ChatPanel({ uploadBatchId }) {
           align-items: center;
           gap: 12px;
           padding: 18px 20px;
-          border-bottom: 1px solid #1f2942;
+          border-bottom: 1px solid var(--border-card);
           background: linear-gradient(180deg, rgba(0,112,243,0.06), transparent);
         }
         .chat-avatar {
@@ -202,7 +202,7 @@ export default function ChatPanel({ uploadBatchId }) {
           border-radius: 6px;
           flex-shrink: 0;
         }
-        .clear-btn:hover { background: #1f2942; color: #f87171; }
+        .clear-btn:hover { background: var(--bg-card-elevated); color: #f87171; }
 
         .chat-messages {
           flex: 1;
@@ -257,8 +257,8 @@ export default function ChatPanel({ uploadBatchId }) {
         }
         .suggestion-chip {
           text-align: left;
-          background: #151f37;
-          border: 1px solid #2a344e;
+          background: var(--bg-card-elevated);
+          border: 1px solid var(--border-card);
           color: #aec6ff;
           font-size: 13px;
           padding: 9px 14px;
@@ -286,13 +286,13 @@ export default function ChatPanel({ uploadBatchId }) {
           display: flex;
           gap: 10px;
           padding: 16px;
-          border-top: 1px solid #1f2942;
+          border-top: 1px solid var(--border-card);
         }
         textarea {
           flex: 1;
           resize: none;
-          background: #151f37;
-          border: 1px solid #2a344e;
+          background: var(--bg-card-elevated);
+          border: 1px solid var(--border-card);
           border-radius: 12px;
           padding: 10px 14px;
           color: #ffffff;
@@ -311,6 +311,22 @@ export default function ChatPanel({ uploadBatchId }) {
           flex-shrink: 0;
         }
         .chat-input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ===== LIGHT MODE ===== */
+        :global(html[data-theme="light"]) .chat-panel { background: #ffffff; border-color: #e2e8f0; }
+        :global(html[data-theme="light"]) .chat-header { border-bottom-color: #e2e8f0; background: linear-gradient(180deg, rgba(0,112,243,0.03), transparent); }
+        :global(html[data-theme="light"]) .chat-title { color: #0f172a; }
+        :global(html[data-theme="light"]) .chat-subtitle { color: #64748b; }
+        :global(html[data-theme="light"]) .clear-btn { color: #64748b; }
+        :global(html[data-theme="light"]) .clear-btn:hover { background: #f1f5f9; color: #f87171; }
+        :global(html[data-theme="light"]) .route-badge { color: #0369a1; background: rgba(0,112,243,0.06); border-color: rgba(0,112,243,0.15); }
+        :global(html[data-theme="light"]) .bubble-content { color: #0f172a; background: #f1f5f9; }
+        :global(html[data-theme="light"]) .chat-bubble.user .bubble-content { background: #0070f3; color: white; }
+        :global(html[data-theme="light"]) .suggestion-chip { background: #f1f5f9; border-color: #e2e8f0; color: #0070f3; }
+        :global(html[data-theme="light"]) .suggestion-chip:hover { background: #e2e8f0; border-color: #0070f3; }
+        :global(html[data-theme="light"]) .chat-input-row { border-top-color: #e2e8f0; }
+        :global(html[data-theme="light"]) textarea { background: #f1f5f9; border-color: #e2e8f0; color: #0f172a; }
+        :global(html[data-theme="light"]) textarea:focus { border-color: #0070f3; }
       `}</style>
     </div>
   );

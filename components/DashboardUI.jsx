@@ -215,21 +215,22 @@ export default function DashboardUI({ session, uploads }) {
 
       <style jsx global>{`
         body {
-          background-color: #07122a;
-          color: #ffffff;
+          background-color: var(--bg-primary);
+          color: var(--text-primary);
           overflow-x: hidden;
           background-image:
-            linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 50px 50px;
+            linear-gradient(to right, var(--bg-grid-line) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--bg-grid-line) 1px, transparent 1px);
+          background-size: 32px 32px;
           font-family: 'Segoe UI', -apple-system, sans-serif;
+          transition: background-color 0.2s, color 0.2s;
         }
 
         .ambient-glow {
           position: absolute;
           width: 800px;
           height: 800px;
-          background: radial-gradient(circle, rgba(0,112,243,0.08) 0%, rgba(7,18,42,0) 60%);
+          background: radial-gradient(circle, var(--accent-soft) 0%, transparent 60%);
           border-radius: 50%;
           z-index: -1;
           pointer-events: none;
@@ -244,7 +245,7 @@ export default function DashboardUI({ session, uploads }) {
           z-index: 50;
           background: rgba(7,18,42,0.9);
           backdrop-filter: blur(12px);
-          border-bottom: 1px solid #151f37;
+          border-bottom: 1px solid var(--border-card);
         }
         .navbar-inner {
           display: flex;
@@ -259,7 +260,7 @@ export default function DashboardUI({ session, uploads }) {
           width: 24px; height: 24px; border-radius: 6px;
           background: linear-gradient(135deg, #0070f3, #0059c5);
         }
-        .brand-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; }
+        .brand-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); }
 
         .nav-right { display: flex; align-items: center; gap: 16px; }
 
@@ -287,9 +288,9 @@ export default function DashboardUI({ session, uploads }) {
         .btn-primary.lg { padding: 14px 32px; border-radius: 12px; font-size: 15px; }
 
         .btn-ghost {
-          background: #1f2942;
-          border: 1px solid #2a344e;
-          color: #ffffff;
+          background: var(--bg-card-elevated);
+          border: 1px solid var(--border-card);
+          color: var(--text-primary);
           text-decoration: none;
           padding: 8px 16px;
           border-radius: 10px;
@@ -300,7 +301,7 @@ export default function DashboardUI({ session, uploads }) {
           justify-content: center;
           transition: all 0.3s ease;
         }
-        .btn-ghost:hover { background: #2a344e; border-color: #414754; }
+        .btn-ghost:hover { background: var(--border-card); border-color: var(--accent); }
 
         .dashboard-page {
           max-width: 1280px;
@@ -315,15 +316,15 @@ export default function DashboardUI({ session, uploads }) {
           align-items: center;
           gap: 8px;
           margin-bottom: 20px;
-          color: #aec6ff;
+          color: var(--badge-text);
           font-size: 11px;
           font-weight: 700;
           letter-spacing: 0.15em;
         }
         .badge-dot {
           width: 6px; height: 6px; border-radius: 50%;
-          background: #aec6ff;
-          box-shadow: 0 0 8px rgba(0,112,243,0.8);
+          background: var(--badge-dot);
+          box-shadow: 0 0 8px var(--badge-dot-glow);
         }
 
         h1 {
@@ -332,30 +333,30 @@ export default function DashboardUI({ session, uploads }) {
           line-height: 1;
           letter-spacing: -0.03em;
           margin: 0 0 16px 0;
-          color: #ffffff;
+          color: var(--text-primary);
         }
         @media (min-width: 768px) { h1 { font-size: 64px; } }
 
         .subtitle {
           font-size: 18px;
           line-height: 28px;
-          color: #c1c6d7;
+          color: var(--text-secondary);
           max-width: 640px;
           margin: 0;
         }
 
         .uploads-card-wrap { max-width: 1280px; }
         .uploads-card {
-          background: #101b33;
-          border: 1px solid #1f2942;
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
           border-radius: 20px;
           padding: 32px;
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
         .empty-state { text-align: center; padding: 64px 24px; }
-        .empty-title { font-size: 20px; font-weight: 700; color: #ffffff; margin: 0 0 8px 0; }
-        .empty-sub { color: #c1c6d7; font-size: 15px; margin: 0 0 32px 0; }
+        .empty-title { font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0 0 8px 0; }
+        .empty-sub { color: var(--text-secondary); font-size: 15px; margin: 0 0 32px 0; }
 
         .table-wrapper { overflow-x: auto; }
         .uploads-table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -364,20 +365,20 @@ export default function DashboardUI({ session, uploads }) {
           font-size: 11px;
           letter-spacing: 0.15em;
           font-weight: 700;
-          color: #aec6ff;
+          color: var(--badge-text);
           padding: 0 16px 16px 16px;
-          border-bottom: 1px solid #1f2942;
+          border-bottom: 1px solid var(--border-card);
         }
 
         .uploads-table td {
           padding: 20px 16px;
-          border-bottom: 1px solid #151f37;
+          border-bottom: 1px solid var(--border-card);
           vertical-align: middle;
         }
 
-        .file-name { font-size: 16px; font-weight: 600; color: #ffffff; }
-        .batch-id { font-size: 12px; color: #6b7690; margin-top: 4px; font-family: monospace; }
-        .table-date { color: #c1c6d7; font-size: 14px; }
+        .file-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+        .batch-id { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-family: monospace; }
+        .table-date { color: var(--text-secondary); font-size: 14px; }
 
         .status-badge {
           display: inline-flex;

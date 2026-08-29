@@ -6,6 +6,7 @@ import ExceptionTable from './ExceptionTable';
 import AuditTimeline from './AuditTimeline';
 import ReconcileButton from './ReconcileButton';
 import ChatPanel from './ChatPanel';
+import HealthSummaryCard from './HealthSummaryCard';
 import { downloadReconciliationCSV } from '@/lib/exportCSV';
 export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
   const [metrics, setMetrics] = useState(null);
@@ -21,14 +22,36 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
   const qs = uploadBatchId ? `?uploadBatchId=${uploadBatchId}` : '';
 
   async function loadData() {
-    const [metricsRes, exceptionsRes, auditRes] = await Promise.all([
-      fetch(`/api/metrics${qs}`).then((r) => r.json()),
-      fetch(`/api/exceptions${qs}`).then((r) => r.json()),
-      fetch(`/api/audit${qs}`).then((r) => r.json()),
-    ]);
-    setMetrics(metricsRes);
-    setExceptions(exceptionsRes);
-    setAuditLogs(auditRes);
+    // Retry logic for fetching data - helps with timing issues after reconciliation
+    let retries = 3;
+    let lastError = null;
+
+    while (retries > 0) {
+      try {
+        const [metricsRes, exceptionsRes, auditRes] = await Promise.all([
+          fetch(`/api/metrics${qs}`).then((r) => r.json()),
+          fetch(`/api/exceptions${qs}`).then((r) => r.json()),
+          fetch(`/api/audit${qs}`).then((r) => r.json()),
+        ]);
+
+        if (metricsRes && Array.isArray(exceptionsRes) && Array.isArray(auditRes)) {
+          setMetrics(metricsRes);
+          setExceptions(exceptionsRes);
+          setAuditLogs(auditRes);
+          return; // Success - exit retry loop
+        }
+      } catch (error) {
+        lastError = error;
+      }
+
+      retries--;
+      if (retries > 0) {
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    if (lastError) console.error('Failed to load data after retries:', lastError);
   }
 
   function startFakeProgress(total) {
@@ -86,6 +109,8 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
     setMessage('');
     try {
       await runReconcileWithProgress();
+      // Small delay to ensure database writes are fully committed before fetching
+      await new Promise(resolve => setTimeout(resolve, 1000));
       await loadData();
     } finally {
       setAnalyzing(false);
@@ -140,12 +165,12 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
             padding: 120px 20px; gap: 16px; min-height: 60vh;
           }
           .spinner {
-            width: 32px; height: 32px; border: 3px solid #1f2942; border-top-color: #0070f3;
+            width: 32px; height: 32px; border: 3px solid var(--border-card); border-top-color: #0070f3;
             border-radius: 50%; animation: spin 0.8s linear infinite;
           }
-          p { color: #c1c6d7; font-size: 14px; }
+          p { color: var(--text-secondary); font-size: 14px; }
           .progress-track {
-            width: 240px; height: 5px; background: #1f2942; border-radius: 999px; overflow: hidden;
+            width: 240px; height: 5px; background: var(--bg-card-elevated); border-radius: 999px; overflow: hidden;
           }
           .progress-fill {
             height: 100%; background: #0070f3; transition: width 0.3s ease;
@@ -171,6 +196,8 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
   </div>
 </div>
 
+      <HealthSummaryCard uploadBatchId={uploadBatchId} />
+
       {message && <p className="info-message">{message}</p>}
 
       <MatchRateCard matchRate={metrics.matchRate} totalRecords={metrics.total} matchedCount={metrics.matched} />
@@ -191,20 +218,20 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
   display: flex;
   gap: 10px;
   align-items: center;
-}
-.btn-download {
+}        .btn-download {
+  display: inline-flex; align-items: center; gap: 6px;
   padding: 10px 18px;
   border-radius: 10px;
-  background: #1f2942;
-  border: 1px solid #2a344e;
-  color: #ffffff;
+  background: var(--bg-card-elevated);
+  border: 1px solid var(--border-card);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 .btn-download:hover {
-  background: #2a344e;
+  background: var(--border-card);
   border-color: #0070f3;
 }
         .dash-header {
@@ -213,8 +240,8 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
           align-items: center;
           margin-bottom: 24px;
         }
-        .dash-title { font-size: 22px; font-weight: 700; color: #ffffff; margin: 0; letter-spacing: -0.01em; }
-        .dash-subtitle { font-size: 13px; color: #7c8493; margin: 2px 0 0 0; }
+        .dash-title { font-size: 22px; font-weight: 700; color: var(--text-primary); margin: 0; letter-spacing: -0.01em; }
+        .dash-subtitle { font-size: 13px; color: var(--text-muted); margin: 2px 0 0 0; }
 
         .info-message {
           color: #f5a623;
@@ -247,6 +274,10 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
           position: sticky;
           top: 24px;
         }
+
+        /* ===== LIGHT MODE ===== */
+        :global(html[data-theme='light']) .spinner { border-color: #e2e8f0; border-top-color: #0070f3; }
+        :global(html[data-theme='light']) .progress-track { background: #e2e8f0; }
       `}</style>
     </>
   );

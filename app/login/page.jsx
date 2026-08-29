@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,6 +44,7 @@ export default function LoginPage() {
             <div className="brand-icon" />
             <span className="brand-name">ReconAI</span>
           </Link>
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -88,28 +90,24 @@ export default function LoginPage() {
       </main>
 
       <style jsx>{`
-        :global(body) {
-          background-color: #07122a;
-          color: #ffffff;
-          overflow-x: hidden;
-          background-image:
-            linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 50px 50px;
-          font-family: 'Segoe UI', -apple-system, sans-serif;
-        }
-
         .ambient-glow {
           position: absolute;
           width: 800px;
           height: 800px;
-          background: radial-gradient(circle, rgba(0,112,243,0.08) 0%, rgba(7,18,42,0) 60%);
+          background: radial-gradient(circle, var(--accent-soft) 0%, transparent 60%);
           border-radius: 50%;
           z-index: -1;
           pointer-events: none;
         }
         .ambient-glow.top { top: -20%; left: -10%; }
         .ambient-glow.bottom { bottom: 10%; right: -10%; }
+
+        :global(.ambient-glow) {
+          transition: opacity 0.3s;
+        }
+        :global(html[data-theme="light"]) .ambient-glow {
+          display: none;
+        }
 
         .navbar {
           position: fixed;
@@ -118,12 +116,17 @@ export default function LoginPage() {
           z-index: 50;
           background: rgba(7,18,42,0.9);
           backdrop-filter: blur(12px);
-          border-bottom: 1px solid #151f37;
+          border-bottom: 1px solid var(--border-card);
         }
-        .navbar-inner { display: flex; align-items: center; padding: 16px 24px; max-width: 1280px; margin: 0 auto; }
+        :global(html[data-theme="light"]) .navbar {
+          background: rgba(248,250,252,0.95);
+          border-bottom-color: #e2e8f0;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .navbar-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 1280px; margin: 0 auto; }
         .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
         .brand-icon { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, #0070f3, #0059c5); }
-        .brand-name { font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+        .brand-name { font-size: 22px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
 
         .auth-page {
           min-height: 100vh;
@@ -134,13 +137,17 @@ export default function LoginPage() {
         }
 
         .auth-card {
-          background: #101b33;
-          border: 1px solid #1f2942;
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
           border-radius: 24px;
           padding: 48px;
           max-width: 440px;
           width: 100%;
           box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+          transition: background 0.2s, border-color 0.2s;
+        }
+        :global(html[data-theme="light"]) .auth-card {
+          box-shadow: 0 4px 24px rgba(0,0,0,0.08);
         }
 
         .badge {
@@ -148,40 +155,40 @@ export default function LoginPage() {
           align-items: center;
           gap: 8px;
           margin-bottom: 20px;
-          color: #aec6ff;
+          color: var(--badge-text);
           font-size: 11px;
           font-weight: 700;
           letter-spacing: 0.15em;
         }
         .badge-dot {
           width: 6px; height: 6px; border-radius: 50%;
-          background: #aec6ff;
-          box-shadow: 0 0 8px rgba(0,112,243,0.8);
+          background: var(--badge-dot);
+          box-shadow: 0 0 8px var(--badge-dot-glow);
         }
 
-        h1 { color: #ffffff; font-size: 32px; margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.01em; }
-        .subtitle { color: #c1c6d7; font-size: 16px; line-height: 1.6; margin: 0 0 28px 0; }
+        h1 { color: var(--text-primary); font-size: 32px; margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.01em; }
+        .subtitle { color: var(--text-secondary); font-size: 16px; line-height: 1.6; margin: 0 0 28px 0; }
 
         form { display: flex; flex-direction: column; }
-        label { display: block; color: #ffffff; font-size: 14px; font-weight: 500; margin-bottom: 8px; margin-top: 20px; }
+        label { display: block; color: var(--text-primary); font-size: 14px; font-weight: 500; margin-bottom: 8px; margin-top: 20px; }
         label:first-of-type { margin-top: 0; }
 
         input {
           width: 100%;
           padding: 12px 16px;
-          background: #151f37;
-          border: 1px solid #2a344e;
+          background: var(--bg-card-elevated);
+          border: 1px solid var(--border-card);
           border-radius: 10px;
-          color: #ffffff;
+          color: var(--text-primary);
           font-size: 14px;
-          transition: border-color 0.2s;
+          transition: border-color 0.2s, background 0.2s;
         }
         input:focus {
           outline: none;
-          border-color: #0070f3;
+          border-color: var(--accent);
           box-shadow: 0 0 0 3px rgba(0,112,243,0.15);
         }
-        input::placeholder { color: #6b7690; }
+        input::placeholder { color: var(--text-muted); }
 
         .error-text {
           color: #f87171;
@@ -218,10 +225,10 @@ export default function LoginPage() {
         .switch-link {
           margin-top: 24px;
           font-size: 14px;
-          color: #c1c6d7;
+          color: var(--text-secondary);
           text-align: center;
         }
-        .switch-link a { color: #aec6ff; text-decoration: none; font-weight: 500; }
+        .switch-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
         .switch-link a:hover { text-decoration: underline; }
       `}</style>
     </>

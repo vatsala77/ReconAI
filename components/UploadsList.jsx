@@ -3,7 +3,9 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { Link2, RefreshCw, Plus, FileText, LayoutDashboard, LogOut } from 'lucide-react';
 import ConnectRazorpayModal from './ConnectRazorpayModal';
+import ThemeToggle from './ThemeToggle';
 
 export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyId, user }) {
   const router = useRouter();
@@ -82,7 +84,9 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
             <span className="brand-name">ReconAI</span>
           </Link>
 
-          <div className="profile-wrap" ref={profileRef}>
+          <div className="nav-actions">
+            <ThemeToggle />
+            <div className="profile-wrap" ref={profileRef}>
             <button className="profile-avatar" onClick={() => setShowProfileMenu((v) => !v)}>
               {userInitial}
             </button>
@@ -95,13 +99,14 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
                 </div>
                 <div className="dropdown-divider" />
                 <button className="dropdown-item" onClick={() => router.push('/dashboard')}>
-                  📊 Dashboard
+                  <LayoutDashboard size={14} style={{ marginRight: 8 }} /> Dashboard
                 </button>
                 <button className="dropdown-item logout" onClick={() => signOut({ callbackUrl: '/' })}>
-                  🚪 Log out
+                  <LogOut size={14} style={{ marginRight: 8 }} /> Log out
                 </button>
               </div>
             )}
+            </div>
           </div>
         </div>
       </nav>
@@ -125,18 +130,18 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
                 </div>
               )}
               <button className="btn-ghost" onClick={handleSyncClick} disabled={syncing}>
-                {syncing ? 'Syncing…' : connected ? '🔄 Sync from Razorpay' : '🔗 Connect Razorpay'}
+                {syncing ? <><RefreshCw size={14} className="spin" /> Syncing…</> : connected ? <><RefreshCw size={14} /> Sync from Razorpay</> : <><Link2 size={14} /> Connect Razorpay</>}
               </button>
-              <button className="btn-primary" onClick={() => router.push('/upload')}>+ New Upload</button>
+              <button className="btn-primary" onClick={() => router.push('/upload')}><Plus size={14} /> New Upload</button>
             </div>
           </div>
 
           {uploads.length === 0 ? (
             <div className="empty-state-card">
-              <div className="empty-icon">📊</div>
+              <div className="empty-icon"><FileText size={40} strokeWidth={1.5} /></div>
               <p className="empty-title">No uploads yet</p>
               <p className="empty-subtitle">Upload your first route settlement file to start reconciling.</p>
-              <button className="btn-primary" onClick={() => router.push('/upload')}>+ Upload your first file</button>
+              <button className="btn-primary" onClick={() => router.push('/upload')}><Plus size={14} /> Upload your first file</button>
             </div>
           ) : (
             <div className="uploads-list">
@@ -146,9 +151,12 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
                   className="upload-item"
                   onClick={() => router.push(`/dashboard/${u.id}`)}
                 >
-                  <div>
-                    <p className="upload-name">{u.fileName}</p>
-                    <p className="upload-meta">{u.orderCount} orders · {new Date(u.createdAt).toLocaleDateString('en-IN')}</p>
+                  <div className="upload-item-left">
+                    <div className="upload-file-icon"><FileText size={18} /></div>
+                    <div>
+                      <p className="upload-name">{u.fileName}</p>
+                      <p className="upload-meta">{u.orderCount} orders · {new Date(u.createdAt).toLocaleDateString('en-IN')}</p>
+                    </div>
                   </div>
                   <span className={`status-badge ${u.status}`}>{u.status}</span>
                 </button>
@@ -168,21 +176,22 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
 
       <style jsx>{`
         :global(body) {
-          background-color: #07122a;
-          color: #ffffff;
+          background-color: var(--bg-primary);
+          color: var(--text-primary);
           overflow-x: hidden;
           background-image:
-            linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 50px 50px;
+            linear-gradient(to right, var(--bg-grid-line) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--bg-grid-line) 1px, transparent 1px);
+          background-size: 32px 32px;
           font-family: 'Segoe UI', -apple-system, sans-serif;
+          transition: background-color 0.2s, color 0.2s;
         }
 
         .ambient-glow {
           position: fixed;
           width: 800px;
           height: 800px;
-          background: radial-gradient(circle, rgba(0,112,243,0.08) 0%, rgba(7,18,42,0) 60%);
+          background: radial-gradient(circle, var(--accent-soft) 0%, transparent 60%);
           border-radius: 50%;
           z-index: -1;
           pointer-events: none;
@@ -197,7 +206,12 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
           z-index: 50;
           background: rgba(7,18,42,0.9);
           backdrop-filter: blur(12px);
-          border-bottom: 1px solid #151f37;
+          border-bottom: 1px solid var(--border-card);
+          transition: background 0.2s, border-color 0.2s;
+        }
+        :global(html[data-theme='light']) .navbar {
+          background: rgba(248,250,252,0.95);
+          border-bottom-color: #e2e8f0;
         }
         .navbar-inner {
           display: flex;
@@ -212,7 +226,7 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
           width: 24px; height: 24px; border-radius: 6px;
           background: linear-gradient(135deg, #0070f3, #0059c5);
         }
-        .brand-name { font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+        .brand-name { font-size: 20px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
 
         .profile-wrap { position: relative; }
         .profile-avatar {
@@ -236,29 +250,30 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
           top: 46px;
           right: 0;
           width: 220px;
-          background: #101b33;
-          border: 1px solid #1f2942;
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
           border-radius: 14px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.35);
           overflow: hidden;
           z-index: 60;
         }
         .dropdown-header { padding: 14px 16px; }
-        .dropdown-name { color: #ffffff; font-size: 14px; font-weight: 600; margin: 0 0 2px 0; }
-        .dropdown-email { color: #7c8493; font-size: 12px; margin: 0; word-break: break-all; }
-        .dropdown-divider { height: 1px; background: #1f2942; }
+        .dropdown-name { color: var(--text-primary); font-size: 14px; font-weight: 600; margin: 0 0 2px 0; }
+        .dropdown-email { color: var(--text-muted); font-size: 12px; margin: 0; word-break: break-all; }
+        .dropdown-divider { height: 1px; background: var(--border-card); }
         .dropdown-item {
           width: 100%;
           text-align: left;
           padding: 11px 16px;
           background: none;
           border: none;
-          color: #c1c6d7;
+          color: var(--text-secondary);
           font-size: 13px;
           cursor: pointer;
           transition: background 0.15s;
+          display: flex; align-items: center;
         }
-        .dropdown-item:hover { background: #151f37; }
+        .dropdown-item:hover { background: var(--bg-card-elevated); }
         .dropdown-item.logout { color: #f87171; }
         .dropdown-item.logout:hover { background: rgba(248,113,113,0.08); }
 
@@ -279,19 +294,25 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
           align-items: center;
           gap: 8px;
           margin-bottom: 12px;
-          color: #aec6ff;
+          color: var(--badge-text);
           font-size: 11px;
           font-weight: 700;
           letter-spacing: 0.15em;
         }
         .badge-dot {
           width: 6px; height: 6px; border-radius: 50%;
-          background: #aec6ff;
-          box-shadow: 0 0 8px rgba(0,112,243,0.8);
+          background: var(--badge-dot);
+          box-shadow: 0 0 8px var(--badge-dot-glow);
         }
 
-        h1 { color: #ffffff; font-size: 30px; margin: 0 0 8px 0; font-weight: 800; letter-spacing: -0.01em; }
-        .subtitle { color: #c1c6d7; font-size: 15px; margin: 0; }
+        h1 {
+          color: #ffffff; font-size: 30px; margin: 0 0 8px 0;
+          font-weight: 800; letter-spacing: -0.01em;
+          background: linear-gradient(90deg, #60a5fa, #818cf8);
+          -webkit-background-clip: text; background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .subtitle { color: var(--text-secondary); font-size: 15px; margin: 0; }
 
         .header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
@@ -302,11 +323,12 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
         }
         .dot { width: 6px; height: 6px; border-radius: 50%; background: #34D399; }
         .disconnect-link {
-          background: none; border: none; color: #7c8493; font-size: 11px;
+          background: none; border: none; color: var(--text-muted); font-size: 11px;
           text-decoration: underline; cursor: pointer; margin-left: 6px;
         }
 
         .btn-primary {
+          display: inline-flex; align-items: center; gap: 6px;
           background: #0070f3;
           box-shadow: 0 4px 14px rgba(0,112,243,0.2);
           color: white;
@@ -323,12 +345,15 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
           transform: translateY(-2px);
           background: #0059c5;
         }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-ghost {
-          background: #1f2942;
-          border: 1px solid #2a344e;
-          color: #ffffff;
+          display: inline-flex; align-items: center; gap: 6px;
+          background: var(--bg-card-elevated);
+          border: 1px solid var(--border-card);
+          color: var(--text-primary);
           padding: 11px 20px;
           border-radius: 12px;
           font-weight: 600;
@@ -336,28 +361,34 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
           cursor: pointer;
           transition: all 0.3s ease;
         }
-        .btn-ghost:hover:not(:disabled) { background: #2a344e; border-color: #414754; }
+        .btn-ghost:hover:not(:disabled) { background: var(--border-card); border-color: var(--accent); }
         .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .empty-state-card {
           margin-top: 24px;
-          background: #101b33;
-          border: 1px solid #1f2942;
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
           border-radius: 24px;
           padding: 64px 32px;
           text-align: center;
         }
         .empty-icon { font-size: 40px; margin-bottom: 16px; }
-        .empty-title { font-size: 18px; font-weight: 700; color: #ffffff; margin: 0 0 6px 0; }
-        .empty-subtitle { font-size: 14px; color: #c1c6d7; margin: 0 0 24px 0; }
+        .empty-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0 0 6px 0; }
+        .empty-subtitle { font-size: 14px; color: var(--text-secondary); margin: 0 0 24px 0; }
 
         .uploads-list { display: flex; flex-direction: column; gap: 12px; }
+        .upload-item-left { display: flex; align-items: center; gap: 14px; }
+        .upload-file-icon {
+          width: 40px; height: 40px; border-radius: 10px;
+          background: rgba(0,112,243,0.1); color: #0070f3;
+          display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
         .upload-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: #101b33;
-          border: 1px solid #1f2942;
+          background: var(--bg-card);
+          border: 1px solid var(--border-card);
           border-radius: 14px;
           padding: 18px 22px;
           cursor: pointer;
@@ -367,8 +398,8 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
           transition: border-color 0.2s;
         }
         .upload-item:hover { border-color: rgba(0,112,243,0.3); }
-        .upload-name { color: #ffffff; font-size: 15px; margin: 0 0 4px 0; font-weight: 500; }
-        .upload-meta { color: #7c8493; font-size: 13px; margin: 0; font-family: 'Courier New', monospace; }
+        .upload-name { color: var(--text-primary); font-size: 15px; margin: 0 0 4px 0; font-weight: 500; }
+        .upload-meta { color: var(--text-muted); font-size: 13px; margin: 0; font-family: 'Courier New', monospace; }
         .status-badge {
           font-size: 12px;
           padding: 5px 12px;
@@ -378,6 +409,37 @@ export default function UploadsList({ uploads, isRazorpayConnected, razorpayKeyI
           text-transform: capitalize;
           font-weight: 500;
         }
+
+        .nav-actions { display: flex; align-items: center; gap: 8px; }
+
+        /* ===== LIGHT MODE ===== */
+        :global(html[data-theme='light']) .ambient-glow { display: none; }
+        :global(html[data-theme='light']) .brand-name { color: var(--text-primary); }
+        :global(html[data-theme='light']) .profile-avatar { box-shadow: none; }
+        :global(html[data-theme='light']) .profile-dropdown { background: var(--bg-card); border-color: #e2e8f0; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        :global(html[data-theme='light']) .dropdown-name { color: var(--text-primary); }
+        :global(html[data-theme='light']) .dropdown-email { color: var(--text-muted); }
+        :global(html[data-theme='light']) .dropdown-divider { background: #e2e8f0; }
+        :global(html[data-theme='light']) .dropdown-item { color: var(--text-secondary); }
+        :global(html[data-theme='light']) .dropdown-item:hover { background: var(--bg-card-elevated); }
+        :global(html[data-theme='light']) .badge { color: var(--badge-text); }
+        :global(html[data-theme='light']) .badge-dot { background: var(--badge-dot); box-shadow: 0 0 8px var(--badge-dot-glow); }
+        :global(html[data-theme='light']) .subtitle { color: var(--text-secondary); }
+        :global(html[data-theme='light']) .connection-badge { background: rgba(52,211,153,0.06); border-color: rgba(52,211,153,0.2); }
+        :global(html[data-theme='light']) .disconnect-link { color: var(--text-muted); }
+        :global(html[data-theme='light']) .empty-state-card { background: var(--bg-card); border-color: #e2e8f0; }
+        :global(html[data-theme='light']) .empty-title { color: var(--text-primary); }
+        :global(html[data-theme='light']) .empty-subtitle { color: var(--text-secondary); }
+        :global(html[data-theme='light']) .upload-item { background: var(--bg-card); border-color: #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        :global(html[data-theme='light']) .upload-item:hover { border-color: #0070f3; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        :global(html[data-theme='light']) .upload-file-icon { background: rgba(0,112,243,0.08); color: #0070f3; }
+        :global(html[data-theme='light']) .upload-name { color: var(--text-primary); }
+        :global(html[data-theme='light']) .upload-meta { color: var(--text-muted); }
+        :global(html[data-theme='light']) .status-badge { background: rgba(52,211,153,0.08); }
+
+        :global(html[data-theme='light']) .btn-primary { background: #2563eb; box-shadow: 0 4px 14px rgba(37,99,235,0.2); }
+        :global(html[data-theme='light']) .btn-primary:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(37,99,235,0.3); }
+        :global(html[data-theme='light']) .empty-icon { color: var(--text-muted); }
       `}</style>
     </>
   );

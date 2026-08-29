@@ -83,17 +83,30 @@ export async function POST(request) {
     const bankHeaders = bankRaw.length > 0 ? Object.keys(bankRaw[0]) : [];
     const gstHeaders = gstRaw.length > 0 ? Object.keys(gstRaw[0]) : [];
 
-    const orderMapping = await mapColumnsWithAI(orderHeaders, ordersRaw, REQUIRED_ORDER_FIELDS);
-    const transferMapping = await mapColumnsWithAI(transferHeaders, transfersRaw, REQUIRED_TRANSFER_FIELDS);
-
-    let bankMapping = {};
-    let gstMapping = {};
-
+    // Run ALL AI mapping calls in parallel for speed
+    const mappingPromises = [
+      mapColumnsWithAI(orderHeaders, ordersRaw, REQUIRED_ORDER_FIELDS),
+      mapColumnsWithAI(transferHeaders, transfersRaw, REQUIRED_TRANSFER_FIELDS),
+    ];
+    
     if (bankRaw.length > 0) {
-      bankMapping = await mapColumnsWithAI(bankHeaders, bankRaw, REQUIRED_BANK_FIELDS);
+      mappingPromises.push(mapColumnsWithAI(bankHeaders, bankRaw, REQUIRED_BANK_FIELDS));
     }
     if (gstRaw.length > 0) {
-      gstMapping = await mapColumnsWithAI(gstHeaders, gstRaw, REQUIRED_GST_FIELDS);
+      mappingPromises.push(mapColumnsWithAI(gstHeaders, gstRaw, REQUIRED_GST_FIELDS));
+    }
+    
+    const mappingResults = await Promise.all(mappingPromises);
+    
+    const [orderMapping, transferMapping] = mappingResults;
+    let bankMapping = {};
+    let gstMapping = {};
+    
+    if (bankRaw.length > 0 && mappingResults[2]) {
+      bankMapping = mappingResults[2];
+    }
+    if (gstRaw.length > 0 && mappingResults[2 + (bankRaw.length > 0 ? 1 : 0)]) {
+      gstMapping = mappingResults[2 + (bankRaw.length > 0 ? 1 : 0)];
     }
 
     return new Response(

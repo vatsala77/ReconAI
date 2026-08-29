@@ -1,3 +1,62 @@
+/* ============================================
+   CSS VARIABLES — LIGHT MODE DEFAULTS
+   ============================================ */
+:root {
+  --bg-primary: #f8fafc;
+  --bg-grid-line: rgba(15, 23, 42, 0.07);
+  --bg-card: #ffffff;
+  --bg-card-elevated: #f1f5f9;
+  --border-card: rgba(226, 232, 240, 0.8);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --badge-bg: #e0f2fe;
+  --badge-text: #0369a1;
+  --badge-border: rgba(186, 230, 253, 0.8);
+  --badge-dot: #0369a1;
+  --badge-dot-glow: rgba(3, 105, 161, 0.5);
+
+  --accent: #0070f3;
+  --accent-hover: #0059c5;
+  --accent-soft: rgba(0, 112, 243, 0.08);
+
+  --pill-bg: #e2e8f0;
+}
+
+/* ============================================
+   CSS VARIABLES — DARK MODE
+   ============================================ */
+[data-theme='dark'] {
+  --bg-primary: #07122a;
+  --bg-grid-line: rgba(255, 255, 255, 0.02);
+  --bg-card: #101b33;
+  --bg-card-elevated: #151f37;
+  --border-card: #1f2942;
+  --shadow-card: 0 4px 6px -1px rgba(0,0,0,0.1);
+
+  --text-primary: #ffffff;
+  --text-secondary: #c1c6d7;
+  --text-muted: #7c8493;
+
+  --badge-bg: rgba(174, 198, 255, 0.1);
+  --badge-text: #aec6ff;
+  --badge-border: transparent;
+  --badge-dot: #aec6ff;
+  --badge-dot-glow: rgba(0, 112, 243, 0.8);
+
+  --accent: #0070f3;
+  --accent-hover: #0059c5;
+  --accent-soft: rgba(0, 112, 243, 0.08);
+
+  --pill-bg: #1e293b;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 * {
   margin: 0;
   padding: 0;
@@ -5,9 +64,15 @@
 }
 
 body {
-  background: #0B0E14;
-  color: #E4E7EC;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  background-image:
+    linear-gradient(to right, var(--bg-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 .info-message {
   color: #F59E0B;
@@ -40,12 +105,12 @@ body {
 .title {
   font-size: 22px;
   font-weight: 600;
-  color: #E4E7EC;
+  color: var(--text-primary);
 }
 
 .subtitle {
   font-size: 14px;
-  color: #7C8493;
+  color: var(--text-muted);
   margin-top: 2px;
 }
 
@@ -75,8 +140,8 @@ body {
   background: #0059c5;
 }
 .card {
-  background: #12161F;
-  border: 1px solid #232838;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: 12px;
   padding: 20px;
 }
@@ -85,7 +150,7 @@ body {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #7C8493;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
@@ -110,7 +175,7 @@ body {
 .progress-track {
   margin-top: 16px;
   height: 8px;
-  background: #0B0E14;
+  background: var(--bg-card-elevated);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -132,15 +197,15 @@ body {
 }
 
 .stat-card {
-  background: #12161F;
-  border: 1px solid #232838;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: 12px;
   padding: 16px;
 }
 
 .stat-label {
   font-size: 12px;
-  color: #7C8493;
+  color: var(--text-muted);
   margin-bottom: 4px;
 }
 
@@ -148,6 +213,7 @@ body {
   font-size: 22px;
   font-weight: 500;
   font-family: 'Courier New', monospace;
+  color: var(--text-primary);
 }
 
 .main-grid {
@@ -164,9 +230,9 @@ body {
 .panel-title {
   font-size: 14px;
   font-weight: 500;
-  color: #E4E7EC;
+  color: var(--text-primary);
   padding: 16px 20px;
-  border-bottom: 1px solid #232838;
+  border-bottom: 1px solid var(--border-card);
 }
 
 .exception-row {
@@ -177,14 +243,15 @@ body {
   padding: 14px 20px;
   background: transparent;
   border: none;
-  border-bottom: 1px solid #232838;
+  border-bottom: 1px solid var(--border-card);
   cursor: pointer;
   text-align: left;
   color: inherit;
+  transition: background 0.15s;
 }
 
 .exception-row:hover {
-  background: #171B26;
+  background: var(--bg-card-elevated);
 }
 
 .exception-left {
@@ -207,33 +274,33 @@ body {
 .order-id {
   font-size: 13px;
   font-family: 'Courier New', monospace;
-  color: #E4E7EC;
+  color: var(--text-primary);
 }
 
 .confidence-text {
   font-size: 12px;
-  color: #7C8493;
+  color: var(--text-muted);
   font-family: 'Courier New', monospace;
 }
 
 .exception-detail {
   padding: 0 20px 16px 20px;
   font-size: 14px;
-  color: #B4BAC7;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
 .discrepancy-amount {
   margin-top: 8px;
   font-size: 12px;
-  color: #7C8493;
+  color: var(--text-muted);
   font-family: 'Courier New', monospace;
 }
 
 .empty-text {
   padding: 20px;
   font-size: 14px;
-  color: #7C8493;
+  color: var(--text-muted);
 }
 
 .audit-list {
@@ -266,35 +333,35 @@ body {
 .audit-line {
   width: 1px;
   flex: 1;
-  background: #232838;
+  background: var(--border-card);
   margin-top: 4px;
 }
 
 .audit-action {
   font-size: 14px;
-  color: #E4E7EC;
+  color: var(--text-primary);
 }
 
 .audit-meta {
   font-size: 12px;
-  color: #7C8493;
+  color: var(--text-muted);
   font-family: 'Courier New', monospace;
   margin-top: 2px;
 }
 
 .loading-text {
-  color: #7C8493;
+  color: var(--text-muted);
   font-size: 14px;
 }
 .how-section { max-width: 1280px; margin: 0 auto; padding: 0 24px; margin-bottom: 64px; }
 
 .how-panel {
-  background: #101b33;
-  border: 1px solid #1f2942;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: 24px;
   padding: 48px 32px;
   margin-bottom: 64px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-card);
 }
 
 .how-grid {
@@ -308,16 +375,16 @@ body {
 @media (min-width: 768px) { .how-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .how-card {
-  background: #151f37;
-  border: 1px solid #2a344e;
+  background: var(--bg-card-elevated);
+  border: 1px solid var(--border-card);
   border-radius: 16px;
   padding: 28px;
 }
 .how-num {
   font-size: 32px;
   font-weight: 800;
-  color: rgba(174,198,255,0.4);
+  color: var(--badge-text);
   margin-bottom: 12px;
 }
-.how-card h3 { font-size: 20px; margin: 0 0 12px 0; }
-.how-card p { color: #c1c6d7; font-size: 15px; line-height: 1.6; margin: 0; }
+.how-card h3 { font-size: 20px; margin: 0 0 12px 0; color: var(--text-primary); }
+.how-card p { color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin: 0; }

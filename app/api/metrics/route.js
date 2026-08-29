@@ -44,9 +44,27 @@ export async function GET(request) {
         latestBatch: latestBatch?.batchId || null,
         lastRun: latestBatch?.createdAt || null,
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    console.error('Metrics fetch error:', error);
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+        total: 0,
+        matched: 0,
+        exceptions: 0,
+        openExceptions: 0,
+        amountAtRisk: 0,
+        matchRate: '0.0',
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
   }
 }

@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import Groq from 'groq-sdk';
+import OpenAI from 'openai';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const openrouter = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1',
+});
 
 export async function POST(req, { params }) {
   const { id } = await params;
@@ -32,7 +35,7 @@ Respond ONLY with a JSON object with exactly these keys:
 No markdown, no preamble.`;
 
   try {
-    const completion = await groq.chat.completions.create({
+    const completion = await openrouter.chat.completions.create({
       model: 'openai/gpt-oss-120b',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.2,

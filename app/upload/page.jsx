@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const ORDER_FIELDS = ['order_id', 'amount', 'platform_fee', 'tds', 'refund', 'customer_id', 'seller_id', 'seller_type', 'pan_available'];
 const TRANSFER_FIELDS = ['transfer_id', 'source', 'recipient', 'amount', 'on_hold', 'on_hold_until', 'amount_reversed', 'settlement_status', 'fee', 'tax', 'error_description'];
@@ -158,6 +159,7 @@ export default function UploadPage() {
             <div className="brand-icon" />
             <span className="brand-name">ReconAI</span>
           </Link>
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -282,7 +284,7 @@ export default function UploadPage() {
 
       <style jsx global>{`
         body {
-          background-color: #07122a !important;
+          background-color: var(--bg-primary) !important;
           color: #ffffff !important;
           overflow-x: hidden;
           background-image:
@@ -311,12 +313,12 @@ export default function UploadPage() {
           z-index: 50;
           background: rgba(7, 18, 42, 0.9);
           backdrop-filter: blur(12px);
-          border-bottom: 1px solid #151f37;
+          border-bottom: 1px solid var(--border-card);
         }
-        .navbar-inner { display: flex; align-items: center; padding: 16px 24px; max-width: 1280px; margin: 0 auto; }
+        .navbar-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 1280px; margin: 0 auto; }
         .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
         .brand-icon { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, #0070f3, #0059c5); }
-        .brand-name { font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+        .brand-name { font-size: 22px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
 
         .upload-page {
           min-height: 100vh;
@@ -327,8 +329,8 @@ export default function UploadPage() {
         }
         
         .upload-card {
-          background: #101b33 !important;
-          border: 1px solid #1f2942 !important;
+          background: var(--bg-card) !important;
+          border: 1px solid var(--border-card) !important;
           border-radius: 24px !important;
           padding: 40px !important;
           max-width: 1100px !important;
@@ -356,7 +358,7 @@ export default function UploadPage() {
         h1 { color: #ffffff; font-size: 32px; margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.01em; }
         .subtitle { color: #c1c6d7; font-size: 16px; line-height: 1.6; margin: 0 0 28px 0; }
 
-        .mode-toggle { display: flex; gap: 6px; margin-bottom: 28px; background: #151f37; padding: 4px; border-radius: 10px; border: 1px solid #2a344e; }
+        .mode-toggle { display: flex; gap: 6px; margin-bottom: 28px; background: var(--bg-card-elevated); padding: 4px; border-radius: 10px; border: 1px solid var(--border-card); }
         .mode-btn {
           flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent;
           color: #c1c6d7; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
@@ -371,15 +373,15 @@ export default function UploadPage() {
         .separate-files-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
 
         .simple-file-input {
-          width: 100%; padding: 12px 16px; background: #151f37; border: 1px solid #2a344e;
+          width: 100%; padding: 12px 16px; background: var(--bg-card-elevated); border: 1px solid var(--border-card);
           border-radius: 10px; color: #ffffff; font-size: 14px; transition: border-color 0.2s;
         }
 
         .file-drop { position: relative; margin-top: 4px; }
         .file-drop input[type="file"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
         .file-label {
-          display: flex; align-items: center; gap: 16px; padding: 24px; background: #151f37;
-          border: 1.5px dashed #2a344e; border-radius: 12px; color: #ffffff;
+          display: flex; align-items: center; gap: 16px; padding: 24px; background: var(--bg-card-elevated);
+          border: 1.5px dashed var(--border-card); border-radius: 12px; color: var(--text-primary);
           cursor: pointer; transition: all 0.2s ease;
         }
         .file-icon { font-size: 28px; }
@@ -402,7 +404,7 @@ export default function UploadPage() {
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-ghost {
-          background: #151f37; border: 1px solid #2a344e; color: #ffffff;
+          background: var(--bg-card-elevated); border: 1px solid var(--border-card); color: var(--text-primary);
           padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 15px;
           display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
@@ -435,7 +437,7 @@ export default function UploadPage() {
           font-weight: 700 !important;
           margin: 0 0 16px 0 !important;
           padding-bottom: 8px !important;
-          border-bottom: 1px solid #2a344e !important;
+          border-bottom: 1px solid var(--border-card) !important;
         }
 
         .fields-list {
@@ -452,8 +454,8 @@ export default function UploadPage() {
           justify-content: space-between !important;
           gap: 12px !important;
           width: 100% !important;
-          background: #101b33 !important;
-          border: 1px solid #1f2942 !important;
+          background: var(--bg-card) !important;
+          border: 1px solid var(--border-card) !important;
           border-radius: 8px !important;
           padding: 8px 12px !important;
           box-sizing: border-box !important;
@@ -529,6 +531,41 @@ export default function UploadPage() {
             grid-template-columns: 1fr !important;
           }
         }
+
+        /* ===== LIGHT MODE ===== */
+        :global(html[data-theme="light"]) body {
+          background-color: #f8fafc !important;
+          color: #0f172a !important;
+          background-image:
+            linear-gradient(to right, rgba(15,23,42,0.06) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(15,23,42,0.06) 1px, transparent 1px) !important;
+          background-size: 32px 32px !important;
+        }
+        :global(html[data-theme="light"]) .ambient-glow { display: none !important; }
+        :global(html[data-theme="light"]) .navbar { background: rgba(248,250,252,0.95) !important; border-bottom-color: #e2e8f0 !important; }
+        :global(html[data-theme="light"]) .brand-name { color: #0f172a !important; }
+        :global(html[data-theme="light"]) .upload-card { background: #ffffff !important; border-color: #e2e8f0 !important; }
+        :global(html[data-theme="light"]) .badge { color: #0369a1 !important; }
+        :global(html[data-theme="light"]) .badge-dot { background: #0369a1 !important; box-shadow: 0 0 8px rgba(3,105,161,0.5) !important; }
+        :global(html[data-theme="light"]) h1 { color: #0f172a !important; }
+        :global(html[data-theme="light"]) .step-sub { color: #475569 !important; }
+        :global(html[data-theme="light"]) .mode-toggle { background: #f1f5f9 !important; border-color: #e2e8f0 !important; }
+        :global(html[data-theme="light"]) .mode-btn { color: #64748b !important; }
+        :global(html[data-theme="light"]) .mode-btn.active { background: #0070f3 !important; color: white !important; }
+        :global(html[data-theme="light"]) .form-label { color: #0f172a !important; }
+        :global(html[data-theme="light"]) .file-zone { background: #f8fafc !important; border-color: #e2e8f0 !important; }
+        :global(html[data-theme="light"]) .file-zone.drag { border-color: #0070f3 !important; background: rgba(0,112,243,0.04) !important; }
+        :global(html[data-theme="light"]) .file-zone p { color: #475569 !important; }
+        :global(html[data-theme="light"]) .file-zone .hint { color: #64748b !important; }
+        :global(html[data-theme="light"]) .field-label { color: #0f172a !important; }
+        :global(html[data-theme="light"]) .field-value { color: #0369a1 !important; }
+        :global(html[data-theme="light"]) .select-box { background-color: #f1f5f9 !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
+        :global(html[data-theme="light"]) .select-box option { background: #ffffff !important; color: #0f172a !important; }
+        :global(html[data-theme="light"]) .btn-ghost { background: #f1f5f9 !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
+        :global(html[data-theme="light"]) .btn-ghost:hover { background: #e2e8f0 !important; }
+        :global(html[data-theme="light"]) .upload-status { color: #0f172a !important; }
+        :global(html[data-theme="light"]) .order-id { color: #0369a1 !important; }
+
       `}</style>
     </>
   );
