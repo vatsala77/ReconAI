@@ -11,7 +11,9 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem('reconai-theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
+    if (document.documentElement.getAttribute('data-theme') !== theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
   }, [theme]);
 
   const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');

@@ -43,6 +43,7 @@ export default function Home() {
   const dashboardHref = isLoggedIn ? '/dashboard' : '/login';
 
   const [activeExample, setActiveExample] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -84,32 +85,51 @@ export default function Home() {
               href="https://github.com/vatsala77/ReconAI"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-ghost"
+              className="btn-ghost nav-desktop"
             >
               ⭐ GitHub
             </a>
+            <button className="hamburger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
+              <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`} />
+              <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`} />
+              <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`} />
+            </button>
             {isLoggedIn ? (
               <>
-                <Link className="btn-primary" href="/dashboard">
+                <Link className="btn-primary nav-desktop" href="/dashboard">
                   Dashboard →
                 </Link>
-                <button className="btn-logout" onClick={() => signOut({ callbackUrl: '/' })}>
+                <button className="btn-logout nav-desktop" onClick={() => signOut({ callbackUrl: '/' })}>
                   Log out
                 </button>
               </>
             ) : (
               <>
-                <div className="nav-links">
-                  <a href="#how-it-works">How It Works</a>
-                  <a href="#differentiators">Features</a>
-                  <a href="#pain-section">Why ReconAI</a>
-                </div>
-                <Link className="btn-primary" href="/login">
+                <Link className="btn-primary nav-desktop" href="/login">
                   Get Started <span className="arrow">→</span>
                 </Link>
               </>
             )}
           </div>
+        </div>
+        {/* Mobile menu */}
+        <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+          <a href="https://github.com/vatsala77/ReconAI" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+          {!isLoggedIn && (
+            <>
+              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
+              <a href="#differentiators" onClick={() => setMobileMenuOpen(false)}>Features</a>
+              <a href="#pain-section" onClick={() => setMobileMenuOpen(false)}>Why ReconAI</a>
+            </>
+          )}
+          {isLoggedIn ? (
+            <>
+              <Link className="btn-primary" href="/dashboard" onClick={() => setMobileMenuOpen(false)}>Dashboard →</Link>
+              <button className="btn-logout" onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: '/' }); }}>Log out</button>
+            </>
+          ) : (
+            <Link className="btn-primary" href="/login" onClick={() => setMobileMenuOpen(false)}>Get Started →</Link>
+          )}
         </div>
       </nav>
 
@@ -323,6 +343,9 @@ export default function Home() {
           border-bottom: 1px solid #151f37;
           transition: background 0.2s, border-color 0.2s;
         }
+        @media (max-width: 767px) {
+          .navbar { position: relative; }
+        }
         :global(html[data-theme='light']) .navbar {
           background: rgba(248,250,252,0.95);
           border-bottom-color: #e2e8f0;
@@ -330,6 +353,10 @@ export default function Home() {
         .navbar-inner {
           display: flex; justify-content: space-between; align-items: center;
           padding: 16px 24px; max-width: 1280px; margin: 0 auto;
+          flex-wrap: wrap;
+        }
+        @media (max-width: 767px) {
+          .navbar-inner { padding: 12px 16px; }
         }
         .brand { display: flex; align-items: center; gap: 8px; }
         .brand-icon {
@@ -343,7 +370,49 @@ export default function Home() {
         .nav-links a:hover { color: var(--text-primary); }
         @media (min-width: 768px) { .nav-links { display: flex; } }
 
-        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .nav-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .hamburger {
+          display: none; background: none; border: none; cursor: pointer;
+          padding: 6px; flex-direction: column; gap: 4px;
+        }
+        .hamburger-line {
+          display: block; width: 22px; height: 2px;
+          background: var(--text-primary); border-radius: 2px;
+          transition: all 0.3s ease;
+        }
+        .hamburger-line.open:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+        .hamburger-line.open:nth-child(2) { opacity: 0; }
+        .hamburger-line.open:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+        .nav-desktop { display: inline-flex; }
+        .mobile-menu {
+          display: none; flex-direction: column; gap: 12px;
+          padding: 0 16px 16px; background: rgba(7,18,42,0.98);
+          border-bottom: 1px solid #151f37;
+        }
+        :global(html[data-theme='light']) .mobile-menu {
+          background: rgba(248,250,252,0.98);
+          border-bottom-color: #e2e8f0;
+        }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a {
+          color: var(--text-secondary); text-decoration: none;
+          padding: 10px 0; font-size: 15px; font-weight: 500;
+          border-bottom: 1px solid var(--border-card);
+        }
+        .mobile-menu a:last-child { border-bottom: none; }
+        .mobile-menu .btn-primary { text-align: center; justify-content: center; }
+        .mobile-menu .btn-logout {
+          background: transparent; border: 1px solid #253154;
+          color: #e2e8f0; padding: 10px; border-radius: 10px;
+          font-size: 14px; cursor: pointer; text-align: center;
+        }
+        @media (max-width: 767px) {
+          .hamburger { display: flex; }
+          .nav-desktop { display: none !important; }
+          .nav-right { gap: 8px; }
+          .nav-right .btn-ghost { padding: 8px 14px; font-size: 13px; }
+          .btn-logout { padding: 6px 10px; font-size: 12px; }
+        }
         .btn-logout {
           background: transparent;
           border: 1px solid #253154;
@@ -390,14 +459,16 @@ export default function Home() {
         .btn-ghost.lg { padding: 14px 32px; border-radius: 12px; font-size: 15px; }
 
         main { padding-top: 140px; padding-bottom: 96px; }
+        @media (max-width: 767px) { main { padding-top: 20px; padding-bottom: 48px; } }
 
         /* ===== HERO ===== */
         .hero {
           max-width: 1280px; margin: 0 auto;
-          padding: 0 24px 64px;
-          min-height: 60vh;
+          padding: 0 16px 40px;
+          min-height: auto;
           display: flex; flex-direction: column; justify-content: center;
         }
+        @media (min-width: 768px) { .hero { padding: 0 24px 64px; min-height: 60vh; } }
 
         .badge {
           display: inline-flex; align-items: center; gap: 8px;
@@ -419,7 +490,7 @@ export default function Home() {
         }
 
         .hero-title {
-          font-size: 80px; font-weight: 800;
+          font-size: 48px; font-weight: 800;
           line-height: 0.9; letter-spacing: -0.04em;
           margin: 0 0 24px 0;
           background: linear-gradient(135deg, #2563eb, #4f46e5, #9333ea, #2563eb);
@@ -434,38 +505,43 @@ export default function Home() {
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        @media (min-width: 768px) { .hero-title { font-size: 120px; } }
+        @media (min-width: 768px) { .hero-title { font-size: 80px; } }
+        @media (min-width: 1024px) { .hero-title { font-size: 120px; } }
 
         .hero-tagline {
-          font-size: 24px; font-weight: 600; line-height: 1.2;
-          max-width: 720px; margin: 0 0 40px 0;
+          font-size: 20px; font-weight: 600; line-height: 1.2;
+          max-width: 720px; margin: 0 0 24px 0;
           color: var(--text-primary);
         }
-        @media (min-width: 768px) { .hero-tagline { font-size: 32px; } }
+        @media (min-width: 768px) { .hero-tagline { font-size: 28px; margin-bottom: 32px; } }
+        @media (min-width: 1024px) { .hero-tagline { font-size: 32px; } }
 
         .hero-subtext {
-          font-size: 18px; line-height: 28px;
+          font-size: 16px; line-height: 1.6;
           color: var(--text-secondary);
-          max-width: 640px; margin: 0 0 48px 0;
+          max-width: 640px; margin: 0 0 32px 0;
         }
+        @media (min-width: 768px) { .hero-subtext { font-size: 18px; line-height: 28px; margin-bottom: 48px; } }
 
-        .hero-ctas { display: flex; flex-direction: column; gap: 16px; width: fit-content; }
-        @media (min-width: 640px) { .hero-ctas { flex-direction: row; } }
+        .hero-ctas { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; }
+        @media (min-width: 640px) { .hero-ctas { flex-direction: row; width: fit-content; } }
 
-        .hero-card-wrap { margin-top: 80px; max-width: 720px; }
+        .hero-card-wrap { margin-top: 48px; max-width: 720px; }
+        @media (min-width: 768px) { .hero-card-wrap { margin-top: 80px; } }
         .hero-card {
           background: var(--bg-card);
           border: 1px solid var(--border-card);
-          border-radius: 16px; padding: 32px;
+          border-radius: 16px; padding: 20px;
           box-shadow: var(--shadow-card);
           transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
           min-height: 168px;
         }
         .hero-card-top {
           display: flex; justify-content: space-between;
-          align-items: flex-start; margin-bottom: 20px;
-          gap: 16px;
+          align-items: flex-start; margin-bottom: 16px;
+          gap: 12px; flex-wrap: wrap;
         }
+        @media (min-width: 768px) { .hero-card-top { padding: 12px; margin-bottom: 20px; gap: 16px; } }
         .label-caps {
           font-size: 12px; letter-spacing: 0.15em;
           font-weight: 600; color: var(--text-secondary);
@@ -473,7 +549,7 @@ export default function Home() {
         }
         .label-caps.small { font-size: 10px; color: var(--badge-text); margin-top: 8px; }
         .hero-card-title {
-          font-size: 24px; font-weight: 600; margin: 0; color: var(--text-primary);
+          font-size: 20px; font-weight: 600; margin: 0; color: var(--text-primary);
           animation: fadeSlideIn 0.4s ease;
         }
         .hero-card-badge {
@@ -515,29 +591,36 @@ export default function Home() {
         }
 
         /* ===== SECTIONS ===== */
-        .section-header { text-align: center; margin-bottom: 64px; padding: 0 24px; }
+        .section-header { text-align: center; margin-bottom: 40px; padding: 0 16px; }
+        @media (min-width: 768px) { .section-header { margin-bottom: 64px; padding: 0 24px; } }
         .section-header h2 {
-          font-size: 32px; font-weight: 700;
+          font-size: 24px; font-weight: 700;
           letter-spacing: -0.01em; margin: 0 0 16px 0;
           color: var(--text-primary);
         }
-        .section-header p { color: var(--text-secondary); font-size: 18px; max-width: 640px; margin: 0 auto; }
+        @media (min-width: 768px) { .section-header h2 { font-size: 32px; } }
+        .section-header p { color: var(--text-secondary); font-size: 16px; max-width: 640px; margin: 0 auto; }
+        @media (min-width: 768px) { .section-header p { font-size: 18px; } }
 
-        .how-section, .diff-section { margin-bottom: 96px; }
-        .how-panel, .diff-panel { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .how-section, .diff-section { margin-bottom: 64px; }
+        @media (min-width: 768px) { .how-section, .diff-section { margin-bottom: 96px; } }
+        .how-panel, .diff-panel { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+        @media (min-width: 768px) { .how-panel, .diff-panel { padding: 0 24px; } }
         .how-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
-        @media (min-width: 768px) { .how-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 768px) { .how-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .how-grid { grid-template-columns: repeat(4, 1fr); } }
 
-        .diff-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
-        @media (min-width: 768px) { .diff-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (min-width: 1024px) { .diff-grid { grid-template-columns: repeat(5, 1fr); } }
+        .diff-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        @media (min-width: 640px) { .diff-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .diff-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; } }
 
         .how-card, .diff-card {
           background: var(--bg-card);
           border: 1px solid var(--border-card);
-          border-radius: 16px; padding: 32px;
+          border-radius: 16px; padding: 24px;
           transition: all 0.25s ease;
         }
+        @media (min-width: 768px) { .how-card, .diff-card { padding: 32px; } }
 
         :global(html[data-theme='light']) .hero-card,
         :global(html[data-theme='light']) .final-cta-panel,
@@ -560,15 +643,18 @@ export default function Home() {
 
         .how-num {
           font-size: 14px; font-weight: 700;
-          color: var(--badge-text); margin-bottom: 16px;
+          color: var(--badge-text); margin-bottom: 12px;
         }
-        .diff-icon { font-size: 28px; margin-bottom: 16px; }
-        .how-card h3, .diff-card h3 { font-size: 20px; font-weight: 700; margin: 0 0 12px 0; color: var(--text-primary); }
-        .how-card p, .diff-card p { color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin: 0; }
+        .diff-icon { font-size: 28px; margin-bottom: 12px; }
+        .how-card h3, .diff-card h3 { font-size: 18px; font-weight: 700; margin: 0 0 10px 0; color: var(--text-primary); }
+        .how-card p, .diff-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin: 0; }
+        @media (min-width: 768px) { .how-card h3, .diff-card h3 { font-size: 20px; } .how-card p, .diff-card p { font-size: 15px; } }
 
         /* ===== CAROUSEL ===== */
-        .pain-section { margin-bottom: 96px; }
-        .carousel-wrap { position: relative; overflow: hidden; padding: 32px 0; }
+        .pain-section { margin-bottom: 64px; }
+        @media (min-width: 768px) { .pain-section { margin-bottom: 96px; } }
+        .carousel-wrap { position: relative; overflow: hidden; padding: 16px 0; }
+        @media (min-width: 768px) { .carousel-wrap { padding: 32px 0; } }
         .fade-edge {
           position: absolute; top: 0; bottom: 0;
           width: 128px; z-index: 10; pointer-events: none;
@@ -586,10 +672,12 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
         .pain-card {
-          width: 340px; flex-shrink: 0;
+          width: 300px; flex-shrink: 0;
           background: var(--bg-card);
           border: 1px solid var(--border-card);
-          border-radius: 16px; padding: 28px;
+          border-radius: 16px; padding: 20px;
+        }
+        @media (min-width: 768px) { .pain-card { width: 340px; padding: 28px; } }
           text-decoration: none; color: inherit;
           display: block; transition: all 0.2s;
         }
@@ -608,23 +696,26 @@ export default function Home() {
         .pain-link { color: var(--accent); font-size: 13px; margin: 0; }
 
         /* ===== CTA ===== */
-        .final-cta { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .final-cta { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+        @media (min-width: 768px) { .final-cta { padding: 0 24px; } }
         .final-cta-panel {
           background: var(--bg-card);
           border: 1px solid var(--border-card);
-          border-radius: 24px; padding: 64px 32px;
+          border-radius: 16px; padding: 40px 20px;
           text-align: center;
           box-shadow: var(--shadow-card);
         }
-        .final-cta-panel h2 { font-size: 32px; margin: 0 0 16px 0; letter-spacing: -0.01em; color: var(--text-primary); }
+        .final-cta-panel h2 { font-size: 22px; margin: 0 0 12px 0; letter-spacing: -0.01em; color: var(--text-primary); }
+        @media (min-width: 640px) { .final-cta-panel h2 { font-size: 28px; } }
         @media (min-width: 768px) { .final-cta-panel h2 { font-size: 40px; } }
-        .final-cta-panel p { color: var(--text-secondary); font-size: 18px; margin: 0 0 32px 0; }
+        .final-cta-panel p { color: var(--text-secondary); font-size: 16px; margin: 0 0 24px 0; }
+        @media (min-width: 768px) { .final-cta-panel p { font-size: 18px; margin-bottom: 32px; } }
 
         /* ===== FOOTER ===== */
         .footer {
           position: relative;
           background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 30%, #7dd3fc 60%, #38bdf8 100%);
-          padding: 0 24px 48px;
+          padding: 0 16px 32px;
           transition: background 0.2s;
           overflow: hidden;
         }
@@ -669,8 +760,10 @@ export default function Home() {
         :global(html[data-theme='dark']) .footer-copy { color: #7dd3fc; opacity: 0.6; }
 
         /* ===== MISC ===== */
-        .reveal-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .reveal-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; animation: revealFallback 0s 1.2s forwards; }
         .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+        @keyframes revealFallback { to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) { .reveal-on-scroll { opacity: 1; transform: none; animation: none; } }
         .arrow { font-size: 14px; }
 
 

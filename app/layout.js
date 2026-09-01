@@ -10,8 +10,15 @@ export default async function RootLayout({ children }) {
   const session = await auth();
 
   return (
-    <html lang="en" data-theme="dark">
-      <body className={rubik.className}>
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('reconai-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className={rubik.className} suppressHydrationWarning>
         <ThemeProvider>
           <SessionProvider session={session}>
             {children}
