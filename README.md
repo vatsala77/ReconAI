@@ -2,6 +2,8 @@
 
 > **Route splits your payments. AI explains where they went. 💡**
 
+🌐 **Live Demo:** [recon-ai-ochre.vercel.app](https://recon-ai-ochre.vercel.app/)
+
 Built with ❤️ for **Razorpay AI Buildathon 2026** — *Track 04: AI Finance Controller* 🏆
 
 ---
