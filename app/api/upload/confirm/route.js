@@ -53,13 +53,18 @@ const orderData = ordersRaw.map((row) => ({
       source: `${batch.id}_${String(row[transferMapping.source])}`,
       recipient: String(row[transferMapping.recipient]),
       amount: Math.round(Number(row[transferMapping.amount]) * 100),
-      onHold: transferMapping.on_hold ? Boolean(row[transferMapping.on_hold]) : false,
-      onHoldUntil: transferMapping.on_hold_until && row[transferMapping.on_hold_until] ? Number(row[transferMapping.on_hold_until]) : null,
+      onHold: transferMapping.on_hold
+  ? ['yes', 'true', '1'].includes(String(row[transferMapping.on_hold]).trim().toLowerCase())
+  : false,
+      onHoldUntil: transferMapping.on_hold_until && row[transferMapping.on_hold_until]
+  ? Math.floor(new Date(row[transferMapping.on_hold_until]).getTime() / 1000)
+  : null,
       amountReversed: transferMapping.amount_reversed ? Math.round(Number(row[transferMapping.amount_reversed] || 0) * 100) : 0,
       settlementStatus: transferMapping.settlement_status ? (row[transferMapping.settlement_status] || 'pending') : 'pending',
       fee: transferMapping.fee ? Math.round(Number(row[transferMapping.fee] || 0) * 100) : 0,
       tax: transferMapping.tax ? Math.round(Number(row[transferMapping.tax] || 0) * 100) : 0,
       errorDescription: transferMapping.error_description ? (row[transferMapping.error_description] || null) : null,
+      notes: { sourceType: 'excel' },
       createdAt: Math.floor(Date.now() / 1000),
     }));
 

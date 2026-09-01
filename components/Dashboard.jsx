@@ -122,7 +122,8 @@ export default function Dashboard({ uploadBatchId = null, autoRun = false }) {
   useEffect(() => {
     async function init() {
       const res = await fetch(`/api/metrics${qs}`).then((r) => r.json());
-      if (autoRun && !hasAutoRun.current && res.total === 0) {
+      const shouldAutoRun = autoRun && !hasAutoRun.current && res.total === 0;
+      if (shouldAutoRun) {
         hasAutoRun.current = true;
         setAnalyzing(true);
         await runReconcileWithProgress();

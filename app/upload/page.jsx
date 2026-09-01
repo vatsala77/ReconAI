@@ -565,6 +565,14 @@ export default function UploadPage() {
         :global(html[data-theme="light"]) .btn-ghost:hover { background: #e2e8f0 !important; }
         :global(html[data-theme="light"]) .upload-status { color: #0f172a !important; }
         :global(html[data-theme="light"]) .order-id { color: #0369a1 !important; }
+        :global(html[data-theme="light"]) .mapping-card { background: #f0f9ff !important; border-color: #7dd3fc !important; }
+        :global(html[data-theme="light"]) .card-title { color: #0f172a !important; border-bottom-color: #e2e8f0 !important; }
+        :global(html[data-theme="light"]) .field-name { color: #0f172a !important; }
+        :global(html[data-theme="light"]) .field-row { background: #ffffff !important; border-color: #e2e8f0 !important; }
+        :global(html[data-theme="light"]) .simple-file-input { background: #f1f5f9 !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
+        :global(html[data-theme="light"]) .file-main-text { color: #0f172a !important; }
+        :global(html[data-theme="light"]) .subtitle { color: #475569 !important; }
+        :global(html[data-theme="light"]) .warn-badge { color: #d97706 !important; }
 
       `}</style>
     </>

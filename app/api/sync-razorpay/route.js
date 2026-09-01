@@ -152,24 +152,38 @@ export async function POST(req) {
 
   for (const transfer of transfersResponse.items) {
     try {
-      const payment = await razorpay.payments.fetch(transfer.source);
+      let payment = null;
+      try {
+        payment = await razorpay.payments.fetch(transfer.source);
+      } catch (paymentErr) {
+        console.warn(`Payment fetch failed for transfer ${transfer.id}, falling back to transfer data:`, paymentErr.message);
+      }
+
+      const orderId = transfer.source || transfer.id;
+      const orderAmount = payment?.amount ?? transfer.amount;
+      const customerId = payment?.email || payment?.contact || transfer.recipient || 'unknown';
 
       await prisma.order.upsert({
-        where: { orderId: transfer.source },
-        update: {},
+        where: { orderId },
+        update: {
+          amount: orderAmount,
+          customerId,
+          sellerId: transfer.recipient,
+          uploadBatchId: batch.id,
+        },
         create: {
-          orderId: transfer.source,
-          amount: payment.amount,
-          customerId: payment.email || payment.contact || 'unknown',
+          orderId,
+          amount: orderAmount,
+          customerId,
           sellerId: transfer.recipient,
           uploadBatchId: batch.id,
         },
       });
 
-      await prisma.routeTransfer.create({
-        data: {
-          transferId: transfer.id,
-          source: transfer.source,
+      await prisma.routeTransfer.upsert({
+        where: { transferId: transfer.id },
+        update: {
+          source: orderId,
           recipient: transfer.recipient,
           amount: transfer.amount,
           onHold: transfer.on_hold || false,
@@ -177,6 +191,20 @@ export async function POST(req) {
           settlementStatus: transfer.status || 'pending',
           fee: transfer.fees || 0,
           tax: transfer.tax || 0,
+          notes: { sourceType: 'razorpay' },
+          createdAt: transfer.created_at,
+        },
+        create: {
+          transferId: transfer.id,
+          source: orderId,
+          recipient: transfer.recipient,
+          amount: transfer.amount,
+          onHold: transfer.on_hold || false,
+          onHoldUntil: transfer.on_hold_until || null,
+          settlementStatus: transfer.status || 'pending',
+          fee: transfer.fees || 0,
+          tax: transfer.tax || 0,
+          notes: { sourceType: 'razorpay' },
           createdAt: transfer.created_at,
         },
       });

@@ -481,7 +481,7 @@ export default function Home() {
           font-weight: 700;
           padding: 6px 12px;
           border-radius: 8px;
-          border: 1px solid;
+          border: none;
           white-space: nowrap;
           flex-shrink: 0;
           animation: fadeSlideIn 0.4s ease;
@@ -528,7 +528,7 @@ export default function Home() {
         .how-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
         @media (min-width: 768px) { .how-grid { grid-template-columns: repeat(4, 1fr); } }
 
-        .diff-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        .diff-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
         @media (min-width: 768px) { .diff-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1024px) { .diff-grid { grid-template-columns: repeat(5, 1fr); } }
 
@@ -539,11 +539,11 @@ export default function Home() {
           transition: all 0.25s ease;
         }
 
+        :global(html[data-theme='light']) .hero-card,
+        :global(html[data-theme='light']) .final-cta-panel,
         :global(html[data-theme='light']) .how-card,
         :global(html[data-theme='light']) .diff-card,
-        :global(html[data-theme='light']) .hero-card,
-        :global(html[data-theme='light']) .pain-card,
-        :global(html[data-theme='light']) .final-cta-panel {
+        :global(html[data-theme='light']) .pain-card {
           background: #f0f9ff !important;
           border: 1px solid #7dd3fc !important;
           box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08) !important;

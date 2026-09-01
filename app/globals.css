@@ -405,14 +405,15 @@ html[data-theme='light'] .demo-file-banner,
 html[data-theme='light'] .preview-panel,
 html[data-theme='light'] .profile-dropdown,
 html[data-theme='light'] .connection-badge,
-html[data-theme='light'] [style*="background: var(--bg-card)"],
-html[data-theme='light'] [class*="card"] {
+html[data-theme='light'] [style*="background: var(--bg-card)"] {
   background: #f0f9ff !important;
   border: 1px solid #7dd3fc !important;
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08) !important;
 }
 html[data-theme='light'] .how-panel,
-html[data-theme='light'] .diff-panel {
+html[data-theme='light'] .diff-panel,
+html[data-theme='light'] .hero-card,
+html[data-theme='light'] .final-cta-panel {
   background: #f0f9ff !important;
   border: 1px solid #7dd3fc !important;
 }
