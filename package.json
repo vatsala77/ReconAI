@@ -9,6 +9,15 @@
      "build": "prisma generate && next build",
     "postinstall": "prisma generate"
   },
+  
+  "config": {
+    "allow-scripts": {
+      "@prisma/client": true,
+      "@prisma/engines": true,
+      "prisma": true
+    }
+  }
+,
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
     "@google/generative-ai": "^0.24.1",
